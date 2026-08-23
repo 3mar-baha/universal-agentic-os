@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint/main/schema/.markdownlint.jsonc",
+
+  // Documentation is prose-first: long paragraphs, Arabic text (where hard
+  // wrapping breaks RTL rendering) and tables are deliberately not wrapped.
+  "MD013": false,
+
+  // Table pipe spacing is a rendering-neutral stylistic preference.
+  "MD060": false,
+
+  // Bold lead-ins inside procedure steps are intentional, not missing headings.
+  "MD036": false,
+
+  // Architecture diagrams are ASCII art in language-less fenced code blocks.
+  "MD040": false,
+
+  // Repeated subsection headings across sibling sections (per archetype,
+  // per toolkit, per guard) mirror the framework's uniform structure.
+  "MD024": { "siblings_only": true },
+
+  // Ordered lists restart numbering between independent question groups.
+  "MD029": false
+}
