@@ -147,7 +147,7 @@ record_status() {
     local index="$1"
     local status="$2"
 
-    RESULT_STATUS[$index]="$status"
+    RESULT_STATUS[index]="$status"
     case "$status" in
         OK) OK_COUNT=$((OK_COUNT + 1)) ;;
         FAIL) FAIL_COUNT=$((FAIL_COUNT + 1)) ;;

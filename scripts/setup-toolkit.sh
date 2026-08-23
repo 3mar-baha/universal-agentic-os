@@ -39,6 +39,7 @@
 set -u
 
 SCRIPT_NAME="setup-toolkit.sh"
+# shellcheck disable=SC2016  # literal "$HOME" is intentional: the hint is printed verbatim
 DEFAULT_PROFILE_HINT='export CLAUDE_TOOLKIT_DIR="$HOME/ai-agent-toolkit"'
 
 if [ -z "${HOME:-}" ]; then
@@ -184,10 +185,10 @@ process_toolkits() {
         repo_url="${TOOLKIT_URLS[$i]}"
         target_dir="${TOOLKIT_DIR}/${name}"
         if clone_or_update "$target_dir" "$repo_url"; then
-            RESULT_STATUS[$i]="OK"
+            RESULT_STATUS[i]="OK"
             OK_COUNT=$((OK_COUNT + 1))
         else
-            RESULT_STATUS[$i]="FAIL"
+            RESULT_STATUS[i]="FAIL"
             FAIL_COUNT=$((FAIL_COUNT + 1))
             log_error "Failed to set up $name."
         fi
