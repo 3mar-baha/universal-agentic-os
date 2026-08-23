@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Check shell syntax
+        run: |
+          for f in scripts/*.sh; do
+            bash -n "$f"
+          done
+
+      - name: Lint shell scripts
+        run: shellcheck scripts/*.sh
+
+      - name: Lint markdown
+        run: npx --yes markdownlint-cli "**/*.md" --ignore node_modules

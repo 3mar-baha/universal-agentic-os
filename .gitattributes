@@ -1,0 +1,12 @@
+# Normalize line endings: commit all text files with LF in the repository.
+* text=auto
+
+# Force LF for shell scripts so they run unchanged on Unix runners.
+*.sh text eol=lf
+
+# Force LF for markdown documentation.
+*.md text eol=lf
+
+# Force LF for YAML configuration and workflows.
+*.yml text eol=lf
+*.yaml text eol=lf

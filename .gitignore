@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Python environments and bytecode
+.venv/
+__pycache__/
+
+# Local environment and secrets
+.env
+
+# Build output
+dist/
+build/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+
+# Test and coverage output
+coverage/
+.pytest_cache/
+
+# Local Claude Code session settings
+.claude/settings.local.json
