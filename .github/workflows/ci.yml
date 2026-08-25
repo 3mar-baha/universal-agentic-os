@@ -231,6 +231,17 @@ jobs:
           git checkout -- docs/10-CHECKPOINT.md
           echo "uos CLI + worktree roundtrip behaves to contract"
 
+      - name: Spec ingestion rejects broken references
+        run: |
+          set -e
+          printf '# Broken Doc\n\nSee [missing](docs/does-not-exist.md).\n' > docs/99-BROKEN-TEST.md
+          if bash scripts/uos.sh ingest > /dev/null 2>&1; then
+            echo "ingest should have failed on a broken reference"; exit 1
+          fi
+          rm docs/99-BROKEN-TEST.md
+          bash scripts/uos.sh ingest > /dev/null
+          echo "ingest failure path verified"
+
   build:
     name: Build
     needs: [lint, test]
