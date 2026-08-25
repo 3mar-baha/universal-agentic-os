@@ -133,9 +133,19 @@ jobs:
         run: |
           set -e
           bash scripts/orchestrate-stage.sh 2 > /dev/null
+          echo '# spec index' > .claude/spec-index.md
+          # A non-empty worktree root holds possibly-uncommitted stream work;
+          # teardown must preserve it and only clear the root when empty.
+          mkdir -p .worktrees/stream-with-work
           bash scripts/teardown-stage.sh
           [ -z "$(ls -A .claude/skills)" ]
           [ -z "$(ls -A .claude/agents)" ]
+          test ! -e .claude/spec-index.md
+          test -d .worktrees/stream-with-work
+          rmdir .worktrees/stream-with-work
+          bash scripts/teardown-stage.sh > /dev/null
+          test ! -e .worktrees
+          echo "teardown wiped ephemera, preserved stream work, cleared empty root"
 
       - name: Session start/end hook smoke test
         env:
