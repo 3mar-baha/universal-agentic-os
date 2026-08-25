@@ -166,6 +166,11 @@ skipped or stayed dirty. Exit status follows scripts/sync-toolkit.sh: zero when 
 toolkit updated or nothing actually failed, nonzero when every present toolkit failed to update.
 Run it periodically and before starting a major engagement so that every project sees current skills.
 
+The `uos` CLI (scripts/uos.sh) wraps both operations behind operator-friendly commands:
+`uos doctor` runs the offline `setup-toolkit.sh --verify` integrity check among its environment
+diagnostics, and a failing toolkit row in its output means re-run `setup-toolkit.sh`. See the
+README's uos CLI table for the full command set.
+
 ### Troubleshooting
 
 **Missing CLAUDE_TOOLKIT_DIR**
