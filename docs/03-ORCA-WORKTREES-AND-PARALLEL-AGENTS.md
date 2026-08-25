@@ -102,6 +102,8 @@ Rule of thumb: if you cannot name the interface that keeps two tasks independent
 
 Five states: create, work, rebase, merge, remove.
 
+The create → merge → remove cycle is automated by the OS itself: `uos dispatch <stream>` provisions a worktree at `.worktrees/<stream>` with the phase context kit pre-injected, and `uos merge <stream>` gates the stream's diff before a `--no-ff` integration and prunes the tree afterwards (see `scripts/dispatch-worktrees.sh`, `scripts/merge-worktrees.sh`). The manual sequence below documents what those scripts perform.
+
 ```bash
 # 1. CREATE — fork from the tip of the integration branch
 git fetch origin

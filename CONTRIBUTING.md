@@ -23,7 +23,12 @@ export CLAUDE_TOOLKIT_DIR="$HOME/ai-agent-toolkit"
 
 # 4. Activate the git hooks (secret scanning + zero AI attribution)
 bash scripts/setup-git-hooks.sh
+
+# 5. Put the uos CLI on your PATH (optional but recommended)
+bash scripts/uos.sh install
 ```
+
+The `uos` CLI wraps every lifecycle script: `uos doctor` verifies this setup end to end, `uos plan` shows the milestone DAG, `uos dispatch <stream>` / `uos merge <stream>` run parallel work in isolated worktrees, and `uos ship` runs all local quality gates before a release. See the [README](README.md#the-uos-cli) for the full command table.
 
 `scripts/setup-toolkit.sh` clones the six upstream toolkits into `CLAUDE_TOOLKIT_DIR` (default `~/ai-agent-toolkit`): everything-claude-code, mattpocock-skills, ponytail, guard-skills, cybersecurity-skills, agency-agents. Run `scripts/sync-toolkit.sh` later to refresh them, and `scripts/setup-toolkit.sh --verify` for an offline integrity check.
 
