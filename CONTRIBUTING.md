@@ -102,6 +102,7 @@ Run them yourself before opening the PR; `.github/workflows/ci.yml` verifies aga
 - [ ] `CHANGELOG.md` entry added.
 - [ ] New automation (if any) ships as a compliant skill under `skills/`.
 - [ ] No secrets, tokens, or credentials anywhere in the diff, logs, or fixtures.
+- [ ] All local quality gates pass — run `uos ship` (or `bash scripts/uos.sh ship`) before opening the PR.
 
 ## Secrets
 
