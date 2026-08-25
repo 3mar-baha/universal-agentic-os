@@ -116,8 +116,15 @@ cmd_doctor() {
     required bash bash --version
     check node node --version
     check npm npm --version
-    check python3 python3 --version
-    python3 -c '' 2> /dev/null || check python python --version
+    # Windows ships a python3 Store-alias stub that resolves but prints no
+    # version; fall through to the real interpreter when that happens.
+    if command -v python3 > /dev/null 2>&1 && [ -n "$(python3 --version 2> /dev/null)" ]; then
+        printf '  ok      %-14s %s\n' 'python3' "$(python3 --version 2> /dev/null | head -n 1)"
+    elif command -v python > /dev/null 2>&1; then
+        printf '  ok      %-14s %s\n' 'python' "$(python --version 2> /dev/null | head -n 1)"
+    else
+        printf '  absent  %-14s not on PATH\n' 'python'
+    fi
     check cargo cargo --version
     check go go version
     check shellcheck shellcheck --version
@@ -309,6 +316,9 @@ main() {
         -h|--help|help|'')
             echo "uos — universal agentic engineering os cli v${UOS_VERSION}"
             usage
+            ;;
+        --version|-V)
+            echo "uos ${UOS_VERSION}"
             ;;
         *)
             echo "uos: unknown command '$cmd' (try: uos help)" >&2
