@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# pre-commit — secret scanner and AI-attribution gate for this repository.
+#
+# Activate with:  bash scripts/setup-git-hooks.sh   (git config core.hooksPath .githooks)
+#
+# Rejects the commit when staged content contains:
+#   1. API keys / high-entropy secrets in added lines
+#      (Anthropic, OpenRouter, GitHub, Slack, AWS patterns, plus a generic
+#      KEY/SECRET/TOKEN assignment heuristic),
+#   2. a new file named .env (placeholders belong in .env.example only),
+#   3. AI attribution markers (Co-authored-by Claude, "Generated with ...").
+#
+# ponytail: targeted key patterns + assignment heuristic instead of full
+# entropy math; swap in gitleaks if scanning needs grow beyond this.
+
+set -u
+
+VIOLATIONS=0
+
+# The badge emoji is built from byte escapes so this hook's own source never
+# contains the literal — the staged-content scan below would otherwise match
+# the scanner itself.
+ROBOT_EMOJI="$(printf '\xF0\x9F\xA4\x96')"
+
+fail() {
+    printf 'PRE-COMMIT REJECTED: %s\n' "$*" >&2
+    VIOLATIONS=$((VIOLATIONS + 1))
+}
+
+# Added lines of staged changes (A/C/M/R), without the +++ header.
+ADDED_LINES="$(git diff --cached --unified=0 --diff-filter=ACMR -- 2> /dev/null | grep -E '^\+' | grep -vE '^\+\+\+')"
+
+if [ -n "$ADDED_LINES" ]; then
+    # 1a. Known API key formats.
+    if printf '%s\n' "$ADDED_LINES" | grep -EqE \
+        'sk-ant-[A-Za-z0-9_-]{20,}|sk-or-v1-[A-Za-z0-9]{16,}|gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}|xox[abprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}'; then
+        fail 'staged diff contains a known API key format (sk-ant-*, sk-or-v1-*, gh*_*, github_pat_*, xox*-*, AKIA*).'
+    fi
+
+    # 1b. Generic high-entropy-looking credential assignments, per line.
+    #     Placeholders (${...}, <...>, your-*, changeme, example, xxx) are allowed.
+    SUSPECT_ASSIGN="$(printf '%s\n' "$ADDED_LINES" \
+        | grep -iE "(api[_-]?key|secret|token|password)[\"']?[[:space:]]*[:=][[:space:]]*[\"']?[A-Za-z0-9+/_=-]{24,}" \
+        | grep -ivE 'your[_-]|changeme|example|placeholder|\$\{|<[^>]+>|xxxx' || true)"
+    if [ -n "$SUSPECT_ASSIGN" ]; then
+        fail 'staged diff contains a credential-like assignment (KEY/SECRET/TOKEN/PASSWORD = long literal).'
+    fi
+
+    # 3. AI attribution inside staged content. Textual markers are matched
+    #    only as trailer-shaped lines (at line start) so that documentation
+    #    ABOUT the rule — including this hook's own source — is not itself
+    #    rejected. The badge emoji stays unanchored.
+    if printf '%s\n' "$ADDED_LINES" | grep -iqE \
+        "^\+[[:space:]]*(co-authored-by:.*(claude|anthropic)|generated (with|by|using)[[:space:]].*(claude|anthropic))|${ROBOT_EMOJI}"; then
+        fail 'staged diff contains AI attribution markers; this repository ships zero AI attribution.'
+    fi
+fi
+
+# 2. A literal .env file must never be committed (.env.example is fine).
+if git diff --cached --name-only --diff-filter=A 2> /dev/null | grep -Eq '(^|/)\.env$'; then
+    fail 'staged changes add a .env file; secrets live outside version control.'
+fi
+
+if [ "$VIOLATIONS" -gt 0 ]; then
+    printf '\n%d violation(s). Fix the staged content and try again.\n' "$VIOLATIONS" >&2
+    exit 1
+fi
+
+exit 0

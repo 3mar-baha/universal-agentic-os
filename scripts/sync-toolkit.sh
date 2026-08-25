@@ -213,13 +213,13 @@ print_summary() {
 
     printf '\n'
     printf 'Sync summary — %s\n' "$TOOLKIT_DIR"
-    printf '--------------------------------------------------------------\n'
+    printf -- '--------------------------------------------------------------\n'
     for ((i = 0; i < ${#TOOLKIT_NAMES[@]}; i++)); do
         name="${TOOLKIT_NAMES[$i]}"
         status="${RESULT_STATUS[$i]}"
         printf '%2d. %-24s %s\n' "$((i + 1))" "$name" "$status"
     done
-    printf '--------------------------------------------------------------\n'
+    printf -- '--------------------------------------------------------------\n'
     printf 'Total: %d   OK: %d   FAIL: %d   SKIP: %d   DIRTY: %d\n' \
         "${#TOOLKIT_NAMES[@]}" "$OK_COUNT" "$FAIL_COUNT" "$SKIP_COUNT" "$DIRTY_COUNT"
 }

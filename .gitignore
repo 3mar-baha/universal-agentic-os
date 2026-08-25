@@ -24,3 +24,13 @@ coverage/
 
 # Local Claude Code session settings
 .claude/settings.local.json
+
+# Ephemeral phase-injected context and circuit-breaker runtime state
+# (managed by scripts/orchestrate-stage.sh and scripts/teardown-stage.sh)
+.claude/skills/
+.claude/agents/
+.claude/.strike_tracker
+.claude/spec-index.md
+
+# Parallel stream worktrees (managed by scripts/dispatch-worktrees.sh)
+.worktrees/

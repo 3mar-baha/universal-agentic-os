@@ -20,13 +20,18 @@ bash scripts/setup-toolkit.sh
 
 # 3. Point the framework at the toolkit directory
 export CLAUDE_TOOLKIT_DIR="$HOME/ai-agent-toolkit"
+
+# 4. Activate the git hooks (secret scanning + zero AI attribution)
+bash scripts/setup-git-hooks.sh
 ```
 
-`scripts/setup-toolkit.sh` clones the six upstream toolkits into `CLAUDE_TOOLKIT_DIR` (default `~/ai-agent-toolkit`): everything-claude-code, mattpocock-skills, ponytail, guard-skills, cybersecurity-skills, agency-agents. Run `scripts/sync-toolkit.sh` later to refresh them.
+`scripts/setup-toolkit.sh` clones the six upstream toolkits into `CLAUDE_TOOLKIT_DIR` (default `~/ai-agent-toolkit`): everything-claude-code, mattpocock-skills, ponytail, guard-skills, cybersecurity-skills, agency-agents. Run `scripts/sync-toolkit.sh` later to refresh them, and `scripts/setup-toolkit.sh --verify` for an offline integrity check.
 
 ## Commit Messages
 
 Conventional Commits is mandatory. Allowed types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.
+
+The `.githooks/pre-commit` and `.githooks/commit-msg` hooks (activated in setup step 4) reject commits containing API keys or AI attribution — this repository ships zero AI attribution in its history. Never bypass them with `--no-verify`.
 
 ```text
 feat(worktrees): recover orphaned worktrees during pool teardown

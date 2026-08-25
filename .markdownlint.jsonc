@@ -11,8 +11,13 @@
   // Bold lead-ins inside procedure steps are intentional, not missing headings.
   "MD036": false,
 
-  // Architecture diagrams are ASCII art in language-less fenced code blocks.
+  // Architecture diagrams are ASCII art in language-less fenced code blocks,
+  // and Mermaid diagrams use their own fenced language tag.
   "MD040": false,
+
+  // Inline HTML (RTL hints for Arabic text, <details> blocks, badges) is
+  // deliberate content, not an injection risk.
+  "MD033": false,
 
   // Repeated subsection headings across sibling sections (per archetype,
   // per toolkit, per guard) mirror the framework's uniform structure.

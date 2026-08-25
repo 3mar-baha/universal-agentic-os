@@ -90,6 +90,20 @@ Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 
 Starting a brand-new project? [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) is the standalone prompt for new projects — paste it into any fresh Claude Code session to run Discover & Launch with the same rigor, no local setup required.
 
+## The `uos` CLI
+
+One entry point over everything above. Install it with `bash scripts/uos.sh install` (links onto `~/.local/bin`), or call it directly:
+
+| Command | What it does |
+| --- | --- |
+| `uos ingest` | Parses and cross-references every spec in `docs/`, read-only; writes `.claude/spec-index.md` for context priming and fails on broken references |
+| `uos plan` | Prints the checkpoint milestone DAG as dispatchable workstreams |
+| `uos dispatch <stream> [phase]` | Provisions an isolated git worktree at `.worktrees/<stream>` on `feature/<stream>`, pre-injected with the phase context kit |
+| `uos merge <stream> [--keep]` | Gates the stream's diff (`bash -n`, shellcheck, markdownlint), merges `--no-ff`, prunes the worktree, stamps the checkpoint |
+| `uos doctor` | Sub-second diagnostics: runtimes, hook wiring, API-key presence, toolkit integrity |
+| `uos ship [--release]` | Runs all local quality gates and prints the release checklist; `--release` additionally opens a draft GitHub release via `gh` for you to publish |
+| `uos status` | Compact 3-line card: active phase, active milestone, test status |
+
 ## Bundled Skills
 
 Six core skills ship with the OS. They are the executable form of its rules.
@@ -116,6 +130,7 @@ Seven guides document the framework end to end:
 | [`docs/04-QUALITY-GATES-AND-SAFETY.md`](docs/04-QUALITY-GATES-AND-SAFETY.md) | Quality gates and safety: the second-pass guards, circuit-breaker policy, secret handling, and the security baseline |
 | [`docs/05-INITIAL-PROMPT.md`](docs/05-INITIAL-PROMPT.md) | The standalone initial prompt for launching a new project with the OS |
 | [`docs/06-ENGINEERING-PILLARS.md`](docs/06-ENGINEERING-PILLARS.md) | The 10 engineering pillars and how every role, phase, skill, and guard operationalizes them |
+| [`docs/10-CHECKPOINT.md`](docs/10-CHECKPOINT.md) | Live session state: `ACTIVE_PHASE`, `status`, and the milestone DAG; completed milestones archive to `docs/archive/` |
 
 ## Multi-Domain
 

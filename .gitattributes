@@ -10,3 +10,6 @@
 # Force LF for YAML configuration and workflows.
 *.yml text eol=lf
 *.yaml text eol=lf
+
+# Git hooks carry no extension; pin them so they run unchanged on Unix runners.
+.githooks/* text eol=lf

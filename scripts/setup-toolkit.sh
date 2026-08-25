@@ -11,6 +11,10 @@
 #   - For each canonical toolkit below: updates it in place with
 #     "git pull --quiet" when it is already cloned, otherwise performs a
 #     shallow "git clone --depth 1".
+#   - With --verify: performs no network operation at all; instead checks
+#     that every canonical toolkit is present (a git working copy with a
+#     resolvable HEAD) and unmutated (clean working tree), and fails if
+#     any of the 6 is missing or dirty.
 #
 # Canonical toolkits (processed in this order):
 #   1. everything-claude-code   github.com/worldflowai/everything-claude-code
@@ -23,15 +27,17 @@
 # Requirements:
 #   - bash
 #   - git available on PATH
-#   - network access to github.com
+#   - network access to github.com (except for --verify)
 #
 # Usage:
-#   ./scripts/setup-toolkit.sh [--dir PATH] [-h | --help]
+#   ./scripts/setup-toolkit.sh [--dir PATH] [--verify] [-h | --help]
 #
 # Exit status:
-#   0 — at least one toolkit was cloned or updated successfully
+#   0 — at least one toolkit was cloned or updated successfully,
+#       or (--verify) all 6 toolkits are present and unmutated
 #   1 — all toolkits failed, the toolkit directory could not be created,
-#       git is missing, or the command line was invalid
+#       git is missing, the command line was invalid, or (--verify) at
+#       least one toolkit is missing or mutated
 #
 # After setup, point agents at the toolkit via your shell profile:
 #   export CLAUDE_TOOLKIT_DIR="$HOME/ai-agent-toolkit"
@@ -48,6 +54,7 @@ if [ -z "${HOME:-}" ]; then
 fi
 
 TOOLKIT_DIR="${CLAUDE_TOOLKIT_DIR:-${HOME}/ai-agent-toolkit}"
+VERIFY=0
 
 readonly -a TOOLKIT_URLS=(
     "https://github.com/worldflowai/everything-claude-code.git"
@@ -84,15 +91,20 @@ Options:
   --dir PATH    Target toolkit directory.
                 Default: \$CLAUDE_TOOLKIT_DIR or \$HOME/ai-agent-toolkit
   --dir=PATH    Same as --dir PATH.
+  --verify      Offline integrity check: every canonical toolkit must be a
+                git working copy with a resolvable HEAD and a clean tree.
+                No clone, no pull, no network.
   -h, --help    Show this help and exit.
 
 Environment:
   CLAUDE_TOOLKIT_DIR   Base directory for the toolkits (overridden by --dir).
 
 Exit status:
-  0    At least one toolkit was cloned or updated successfully.
+  0    At least one toolkit was cloned or updated successfully, or
+       (--verify) all 6 toolkits are present and unmutated.
   1    All toolkits failed, the toolkit directory could not be created,
-       git is missing, or the command line was invalid.
+       git is missing, the command line was invalid, or (--verify) at
+       least one toolkit is missing or mutated.
 EOF
 }
 
@@ -127,6 +139,10 @@ parse_args() {
                     exit 1
                 fi
                 TOOLKIT_DIR="${1#--dir=}"
+                shift
+                ;;
+            --verify)
+                VERIFY=1
                 shift
                 ;;
             *)
@@ -195,6 +211,46 @@ process_toolkits() {
     done
 }
 
+# Offline integrity gate for one toolkit directory: it must be a git working
+# copy with a resolvable HEAD (complete enough to pin) and a clean tree
+# (unmutated — no local edits, no untracked debris). Sets RESULT_STATUS.
+verify_toolkit() {
+    local name="$1"
+    local target_dir="${TOOLKIT_DIR}/${name}"
+    local head_commit
+
+    if [ ! -e "${target_dir}/.git" ]; then
+        log_error "verify: $name is missing or not a git working copy ($target_dir)."
+        return 1
+    fi
+    if ! head_commit="$(git -C "$target_dir" rev-parse --verify HEAD 2>/dev/null)"; then
+        log_error "verify: $name has no resolvable HEAD (incomplete clone?)."
+        return 1
+    fi
+    if [ -n "$(git -C "$target_dir" status --porcelain)" ]; then
+        log_error "verify: $name has a dirty working tree (mutated after clone)."
+        return 1
+    fi
+    printf '[setup] verify: %-24s OK @ %.7s\n' "$name" "$head_commit"
+    return 0
+}
+
+verify_toolkits() {
+    local i
+    local name
+
+    for ((i = 0; i < ${#TOOLKIT_NAMES[@]}; i++)); do
+        name="${TOOLKIT_NAMES[$i]}"
+        if verify_toolkit "$name"; then
+            RESULT_STATUS[i]="OK"
+            OK_COUNT=$((OK_COUNT + 1))
+        else
+            RESULT_STATUS[i]="FAIL"
+            FAIL_COUNT=$((FAIL_COUNT + 1))
+        fi
+    done
+}
+
 print_summary() {
     local i
     local name
@@ -202,13 +258,13 @@ print_summary() {
 
     printf '\n'
     printf 'Setup summary — %s\n' "$TOOLKIT_DIR"
-    printf '--------------------------------------------------------------\n'
+    printf -- '--------------------------------------------------------------\n'
     for ((i = 0; i < ${#TOOLKIT_NAMES[@]}; i++)); do
         name="${TOOLKIT_NAMES[$i]}"
         status="${RESULT_STATUS[$i]}"
         printf '%2d. %-24s %s\n' "$((i + 1))" "$name" "$status"
     done
-    printf '--------------------------------------------------------------\n'
+    printf -- '--------------------------------------------------------------\n'
     printf 'Total: %d   OK: %d   FAIL: %d\n' \
         "${#TOOLKIT_NAMES[@]}" "$OK_COUNT" "$FAIL_COUNT"
 }
@@ -226,11 +282,23 @@ main() {
     parse_args "$@"
     require_git
 
+    log_info "Toolkit directory: $TOOLKIT_DIR"
+
+    if [ "$VERIFY" -eq 1 ]; then
+        verify_toolkits
+        print_summary
+        if [ "$FAIL_COUNT" -gt 0 ]; then
+            log_error "Verification failed for $FAIL_COUNT toolkit(s); run without --verify to (re)install them."
+            exit 1
+        fi
+        printf '[setup] verify: all %d canonical toolkits are present and unmutated.\n' "${#TOOLKIT_NAMES[@]}"
+        exit 0
+    fi
+
     if ! ensure_base_dir; then
         exit 1
     fi
 
-    log_info "Toolkit directory: $TOOLKIT_DIR"
     process_toolkits
     print_summary
 

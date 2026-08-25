@@ -12,6 +12,15 @@ Three roles, always capitalized. Identify yours before you act.
 - **Guide** — owns specification, architecture review, guardrails and quality gates; signs off phase exits.
 - **Implementer** — executes TDD implementation cycles inside isolated git worktrees; one concern per worktree.
 
+## Autonomous Session Protocol
+
+Sessions are zero-prompt by contract; the state machine lives in `docs/10-CHECKPOINT.md`.
+
+1. On session start, read `docs/10-CHECKPOINT.md` (the `session_start` hook automates this). Identify `ACTIVE_PHASE`, `status`, and the milestone DAG.
+2. If `status` is `BLOCKED`: read the Diagnostic Incident Report in the checkpoint, form a changed hypothesis, and stop — no fourth fix attempt (Invariant 4).
+3. Otherwise resume the active milestone immediately using strict TDD. Do not ask for confirmation to continue planned work; prompting for permission on in-scope work violates this protocol.
+4. Completed milestones are archived to `docs/archive/milestone-XX.md` so `docs/10-CHECKPOINT.md` stays under 50 lines. Archiving is part of the milestone's Definition of Done, not an afterthought.
+
 ## Non-Negotiable Invariants
 
 Violating any invariant voids the work. None may be waived, reordered, or partially applied.
@@ -50,6 +59,14 @@ Prime context at session start with the `session-context-primer` skill. Inject o
 ### 7. Isolation
 
 Parallel work runs in git worktrees — one concern per worktree. Two concerns never share a working tree, and uncommitted state never crosses a worktree boundary. Integration happens through reviewed merges, never by direct edits across trees.
+
+### 8. No Error Swallowing
+
+Every failure is surfaced, never absorbed. Empty `catch` blocks, `|| true` on load-bearing commands, and assertions that cannot fail are all violations. Tests assert genuine outcomes with 100% genuine checks — a green suite that could not have failed red is worthless.
+
+### 9. Zero AI Attribution
+
+No commit, file, or document may carry AI attribution — no `Co-authored-by: Claude` trailers, no "Generated with ..." footers, no agent badges. History records what was done and by whom it was commissioned; `.githooks/` enforces this at commit time and must never be bypassed with `--no-verify`.
 
 ## Definition of Done
 

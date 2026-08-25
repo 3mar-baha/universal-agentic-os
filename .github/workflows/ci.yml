@@ -21,12 +21,251 @@ jobs:
 
       - name: Check shell syntax
         run: |
-          for f in scripts/*.sh; do
+          set -e
+          for f in scripts/*.sh .claude/hooks/*.sh .githooks/*; do
+            echo "bash -n $f"
             bash -n "$f"
           done
 
       - name: Lint shell scripts
-        run: shellcheck scripts/*.sh
+        run: |
+          set -e
+          shellcheck scripts/*.sh .claude/hooks/*.sh .githooks/*
 
       - name: Lint markdown
         run: npx --yes markdownlint-cli "**/*.md" --ignore node_modules
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    env:
+      # Tests run against a deterministic fixture toolkit, never the network.
+      TOOLKIT_FIXTURE: ${{ runner.temp }}/fixture-toolkit
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create fixture toolkit
+        run: |
+          set -e
+          TK="$TOOLKIT_FIXTURE"
+          mkdir -p \
+            "$TK/everything-claude-code/agents" \
+            "$TK/everything-claude-code/rules" \
+            "$TK/mattpocock-skills/skills/productivity/grill-me" \
+            "$TK/mattpocock-skills/skills/engineering/to-spec" \
+            "$TK/mattpocock-skills/skills/engineering/tdd" \
+            "$TK/mattpocock-skills/skills/engineering/diagnosing-bugs" \
+            "$TK/mattpocock-skills/skills/misc/git-guardrails-claude-code" \
+            "$TK/guard-skills/skills/clean-code-guard" \
+            "$TK/guard-skills/skills/test-guard" \
+            "$TK/guard-skills/skills/docs-guard" \
+            "$TK/cybersecurity-skills/skills/implementing-github-advanced-security-for-code-scanning" \
+            "$TK/ponytail/skills" \
+            "$TK/agency-agents/testing" \
+            "$TK/agency-agents/product"
+          for skill in ponytail ponytail-audit ponytail-debt ponytail-gain ponytail-help ponytail-review; do
+            mkdir -p "$TK/ponytail/skills/$skill"
+            echo "fixture: $skill" > "$TK/ponytail/skills/$skill/SKILL.md"
+          done
+          echo "fixture: reality-checker"   > "$TK/agency-agents/testing/testing-reality-checker.md"
+          echo "fixture: product-manager"   > "$TK/agency-agents/product/product-manager.md"
+          echo "fixture: grill-me"          > "$TK/mattpocock-skills/skills/productivity/grill-me/SKILL.md"
+          echo "fixture: to-spec"           > "$TK/mattpocock-skills/skills/engineering/to-spec/SKILL.md"
+          echo "fixture: tdd"               > "$TK/mattpocock-skills/skills/engineering/tdd/SKILL.md"
+          echo "fixture: diagnosing-bugs"   > "$TK/mattpocock-skills/skills/engineering/diagnosing-bugs/SKILL.md"
+          echo "fixture: git-guardrails"    > "$TK/mattpocock-skills/skills/misc/git-guardrails-claude-code/SKILL.md"
+          echo "fixture: clean-code-guard"  > "$TK/guard-skills/skills/clean-code-guard/SKILL.md"
+          echo "fixture: test-guard"        > "$TK/guard-skills/skills/test-guard/SKILL.md"
+          echo "fixture: docs-guard"        > "$TK/guard-skills/skills/docs-guard/SKILL.md"
+          echo "fixture: security-review"   > "$TK/cybersecurity-skills/skills/implementing-github-advanced-security-for-code-scanning/SKILL.md"
+          echo '---\nfixture: ecc agent'    > "$TK/everything-claude-code/agents/tdd-guide.md"
+          echo '---\nfixture: ecc architect' > "$TK/everything-claude-code/agents/architect.md"
+          echo '---\nfixture: ecc security-reviewer' > "$TK/everything-claude-code/agents/security-reviewer.md"
+          echo "fixture: ecc testing rules" > "$TK/everything-claude-code/rules/testing.md"
+          echo "fixture: ecc security rules" > "$TK/everything-claude-code/rules/security.md"
+          # uos doctor verifies toolkit integrity via setup-toolkit.sh --verify,
+          # which requires each toolkit to be a clean git working copy.
+          for tk in everything-claude-code mattpocock-skills ponytail guard-skills cybersecurity-skills agency-agents; do
+            git -C "$TK/$tk" init -q
+            git -C "$TK/$tk" add -A
+            git -C "$TK/$tk" -c user.email=fixture@example.invalid -c user.name=Fixture commit -qm "fixture: $tk"
+          done
+
+      - name: Rotate phases 1-4 and assert injections
+        working-directory: ${{ github.workspace }}
+        env:
+          CLAUDE_TOOLKIT_DIR: ${{ runner.temp }}/fixture-toolkit
+        run: |
+          set -e
+          for p in 1 2 3 4; do
+            bash scripts/orchestrate-stage.sh "$p" > /dev/null
+          done
+          # Phase 4 is the last rotation; re-run each phase and assert its kit.
+          bash scripts/orchestrate-stage.sh 1 > /dev/null
+          test -f .claude/agents/reality-checker.md
+          test -f .claude/agents/product-manager.md
+          test -f .claude/skills/grill-me/SKILL.md
+          test -f .claude/skills/to-spec/SKILL.md
+
+          bash scripts/orchestrate-stage.sh 2 > /dev/null
+          for s in ponytail tdd diagnosing-bugs reference-ecc-testing-rules.md; do
+            test -e ".claude/skills/$s"
+          done
+          test -f .claude/agents/tdd-guide.md
+          test -f .claude/agents/architect.md
+
+          bash scripts/orchestrate-stage.sh 3 > /dev/null
+          test -f .claude/skills/clean-code-guard/SKILL.md
+          test -f .claude/skills/test-guard/SKILL.md
+          test -f .claude/skills/security-review/SKILL.md
+          test -f .claude/agents/security-reviewer.md
+
+          bash scripts/orchestrate-stage.sh 4 > /dev/null
+          test -f .claude/skills/docs-guard/SKILL.md
+          test -f .claude/skills/git-guardrails/SKILL.md
+          test -f .claude/skills/github-release-packager.md
+          echo "all phase rotations injected their kit"
+
+      - name: Teardown restores phase-neutral state
+        env:
+          CLAUDE_TOOLKIT_DIR: ${{ runner.temp }}/fixture-toolkit
+        run: |
+          set -e
+          bash scripts/orchestrate-stage.sh 2 > /dev/null
+          bash scripts/teardown-stage.sh
+          [ -z "$(ls -A .claude/skills)" ]
+          [ -z "$(ls -A .claude/agents)" ]
+
+      - name: Session start/end hook smoke test
+        env:
+          CLAUDE_TOOLKIT_DIR: ${{ runner.temp }}/fixture-toolkit
+        run: |
+          set -e
+          out="$(bash .claude/hooks/session_start.sh)"
+          echo "$out" | grep -q 'SESSION START'
+          echo "$out" | grep -q 'active phase  : 1'
+          bash .claude/hooks/session_end.sh
+
+      - name: Circuit breaker unit checks
+        run: |
+          set -e
+          hook=".claude/hooks/post_tool_call.sh"
+          strike_file=".claude/.strike_tracker"
+
+          payload() {
+            printf '{"tool_name":"Bash","tool_input":{"command":"%s"},"tool_response":{"exitCode":%s}}' "$1" "$2"
+          }
+
+          # Non-Bash tool passes through untouched.
+          rc=0; printf '{"tool_name":"Read","tool_response":{"exitCode":1}}' | bash $hook || rc=$?
+          test "$rc" -eq 0 && test ! -e "$strike_file"
+
+          # Untracked command passes through.
+          rc=0; payload "echo hello" 1 | bash $hook || rc=$?
+          test "$rc" -eq 0 && test ! -e "$strike_file"
+
+          # Strike 1 then a pass clears the tracker.
+          payload "npm test" 1 | bash $hook || echo "expected failure feedback"
+          test -f "$strike_file"
+          rc=0; payload "npm test" 0 | bash $hook || rc=$?
+          test "$rc" -eq 0 && test ! -e "$strike_file"
+
+          # Three consecutive failures trip the breaker: exit 2 + DIR + BLOCKED.
+          rc_main=0
+          payload "npm test" 1 | bash $hook || true
+          payload "npm test" 1 | bash $hook || true
+          payload "cargo build" 101 | bash $hook || rc_main=$?
+          test "$rc_main" -eq 2
+          grep -q 'DIAGNOSTIC INCIDENT REPORT' docs/10-CHECKPOINT.md
+          grep -q '^status: BLOCKED' docs/10-CHECKPOINT.md
+          grep -q 'cargo build' docs/10-CHECKPOINT.md
+
+          # Restore the pristine checkpoint for the artifact build.
+          git checkout -- docs/10-CHECKPOINT.md
+          rm -f "$strike_file"
+          echo "circuit breaker behaves to contract"
+
+      - name: uos CLI and worktree roundtrip
+        env:
+          CLAUDE_TOOLKIT_DIR: ${{ runner.temp }}/fixture-toolkit
+        run: |
+          set -e
+          git config user.email "ci@example.invalid"
+          git config user.name "CI"
+          git config core.hooksPath .githooks
+
+          # Read-only commands against the fixture toolkit.
+          bash scripts/uos.sh status
+          bash scripts/uos.sh plan | grep -q 'NEXT'
+          bash scripts/uos.sh ingest
+          test -f .claude/spec-index.md
+          bash scripts/uos.sh doctor
+
+          # Dispatch refuses a dirty index (Invariant 7).
+          echo dirty > dirty.tmp && git add dirty.tmp
+          if bash scripts/uos.sh dispatch ci-fixture-stream 2; then
+            echo "dispatch should have refused a staged change"; exit 1
+          fi
+          git reset dirty.tmp && rm dirty.tmp
+
+          # Full roundtrip: dispatch -> commit in the stream -> merge back.
+          bash scripts/uos.sh dispatch ci-fixture-stream 2
+          test -d .worktrees/ci-fixture-stream
+          test -f .worktrees/ci-fixture-stream/.claude/STREAM.md
+          test -f .worktrees/ci-fixture-stream/.claude/skills/tdd/SKILL.md
+          cd .worktrees/ci-fixture-stream
+          printf '# fixture\n\nA streamed note.\n' > docs/stream-note.md
+          git add docs/stream-note.md
+          git commit -m "test(ci): fixture stream change"
+          cd - > /dev/null
+          bash scripts/uos.sh merge ci-fixture-stream
+          grep -q 'integrated: ci-fixture-stream' docs/10-CHECKPOINT.md
+          git show --stat HEAD | grep -q 'stream-note.md'
+          test ! -e .worktrees/ci-fixture-stream
+          git branch --list 'feature/ci-fixture-stream' | grep -q . && {
+            echo "feature branch should be pruned"; exit 1
+          }
+
+          # Leave a pristine tree for the artifact build.
+          git checkout -- docs/10-CHECKPOINT.md
+          echo "uos CLI + worktree roundtrip behaves to contract"
+
+  build:
+    name: Build
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Integrity gates
+        run: |
+          set -e
+          jq -e '.hooks.SessionStart[0].hooks[0].command' .claude/settings.json > /dev/null
+          jq -e '.hooks.PostToolUse[0].matcher == "Bash"' .claude/settings.json > /dev/null
+          test -f skills/github-release-packager.md
+          test -f docs/10-CHECKPOINT.md
+          head -n 1 scripts/orchestrate-stage.sh | grep -q '^#!/usr/bin/env bash'
+          head -n 1 .claude/hooks/post_tool_call.sh | grep -q '^#!/usr/bin/env bash'
+          head -n 1 .githooks/pre-commit | grep -q '^#!/usr/bin/env bash'
+          lines=$(wc -l < docs/10-CHECKPOINT.md)
+          echo "checkpoint lines: $lines"
+          test "$lines" -lt 50
+
+      - name: Package release artifact
+        run: |
+          set -e
+          tarfile="universal-agentic-os-${GITHUB_SHA::7}.tar.gz"
+          tar -czf "$tarfile" \
+            CLAUDE.md CHANGELOG.md CONTRIBUTING.md LICENSE README.md README.ar.md \
+            .editorconfig .gitattributes .gitignore .env.example .markdownlint.jsonc \
+            docs skills scripts .claude .githooks .github
+          echo "ARTIFACT=$tarfile" >> "$GITHUB_ENV"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: universal-agentic-os-${{ github.sha }}
+          path: universal-agentic-os-*.tar.gz
+          retention-days: 14
