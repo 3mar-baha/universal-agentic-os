@@ -90,7 +90,9 @@ cmd_doctor() {
     }
     required() { # required <label> <command...> — absence fails doctor
         local label="$1"; shift
-        if ! command -v "$1" > /dev/null 2>&1; then
+        if command -v "$1" > /dev/null 2>&1; then
+            printf '  ok      %-14s %s\n' "$label" "$("$@" 2> /dev/null | head -n 1)"
+        else
             printf '  FAIL    %-14s required but not found\n' "$label"
             rc=1
         fi

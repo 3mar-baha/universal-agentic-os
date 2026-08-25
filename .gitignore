@@ -34,3 +34,5 @@ coverage/
 
 # Parallel stream worktrees (managed by scripts/dispatch-worktrees.sh)
 .worktrees/
+
+.claude/STREAM.md
