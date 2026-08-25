@@ -196,8 +196,10 @@ cmd_status() {
         test_state="FAILING (${strikes} strike(s))"
     fi
 
+    # Same offline integrity bar as doctor, so a mutated or missing
+    # toolkit never shows as healthy on the card.
     kit='ok'
-    [ -d "${HOME}/ai-agent-toolkit" ] || kit='missing'
+    bash "${SCRIPT_DIR}/setup-toolkit.sh" --verify > /dev/null 2>&1 || kit='unverified'
 
     printf '+----------------------------------------------------------------+\n'
     printf '| PHASE     : %s/4 %s\n' "$phase" "$(phase_name "$phase")"
