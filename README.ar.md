@@ -7,7 +7,7 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -86,6 +86,14 @@ uos new my-project ~/Projects
 ```
 
 حافظ على تحديث حزمة الأدوات بالأمر `bash scripts/sync-toolkit.sh`.
+
+### مشغّل Vantrilex (ويندوز)
+
+[`vantrilex.ps1`](vantrilex.ps1) هو منسّق Claude Code التفاعلي: اختر المزوّد (DeepSeek مباشر، بوابة OrcaRouter المجانية، Ox Alpha عبر OpenRouter بسياق مليون توكن، أو أي endpoint متوافق تخصصه بنفسك)، ومستوى الجهد حتى Ultracode، ومسار المشروع — فيضبط البيئة ويطلق. لا مفاتيح مخزنة في السكربت: تأتي من بيئتك أو من ملف `.env.vantrilex` المستثنى من git، أو تُطلب عند الإطلاق مع حفظ اختياري.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File vantrilex.ps1
+```
 
 تُشغَّل الجلسات على أساس بروتوكول MCP مثبّت — يفرض ملف [`.mcp.json`](.mcp.json) خمسة خوادم أساسية (`fetch` و`brave-search` و`sequential-thinking` و`filesystem` و`git`؛ والاعتمادات بأسماء متغيرات البيئة فقط) — ويمنح [.devcontainer/](.devcontainer/) تكافؤ بيئة بأمر واحد للصناديق المحلية والسحابية، محمّلًا سلفًا بحزم الأدوات الستّ عبر `postCreateCommand`.
 

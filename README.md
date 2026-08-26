@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -87,6 +87,14 @@ uos new my-project ~/Projects
 ```
 
 Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
+
+### Vantrilex launcher (Windows)
+
+[`vantrilex.ps1`](vantrilex.ps1) is the interactive Claude Code orchestrator: pick a provider (DeepSeek direct, OrcaRouter free gateway, Ox Alpha via OpenRouter with 1M context, or any custom OpenAI-compatible endpoint), an effort level up to Ultracode, and a project path — it sets the environment and launches. No keys are stored in the script: they come from your environment, a gitignored `.env.vantrilex` sidecar, or are asked for at launch with opt-in save.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File vantrilex.ps1
+```
 
 Sessions run with a pinned MCP baseline — [`.mcp.json`](.mcp.json) enforces five core servers (`fetch`, `brave-search`, `sequential-thinking`, `filesystem`, `git`; credentials by environment variable name only) — and [.devcontainer/](.devcontainer/) gives one-command environment parity for local and cloud sandboxes, preloading all 6 toolkits via `postCreateCommand`.
 

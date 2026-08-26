@@ -297,7 +297,8 @@ jobs:
           set -e
           tarfile="universal-agentic-os-${GITHUB_SHA::7}.tar.gz"
           tar -czf "$tarfile" \
-            CLAUDE.md CHANGELOG.md CONTRIBUTING.md LICENSE README.md README.ar.md \
+            CLAUDE.md AGENTS.md CHANGELOG.md CONTRIBUTING.md LICENSE README.md README.ar.md \
+            vantrilex.ps1 \
             .editorconfig .gitattributes .gitignore .env.example .markdownlint.jsonc \
             docs skills scripts .claude .githooks .github
           echo "ARTIFACT=$tarfile" >> "$GITHUB_ENV"

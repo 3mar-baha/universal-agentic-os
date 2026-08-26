@@ -2,6 +2,20 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
 
+## [1.4.2] - 2026-08-26
+
+The Vantrilex launcher: one interactive entry point for running Claude Code across providers, with zero secrets committed.
+
+### Added
+
+- `vantrilex.ps1`: the Vantrilex Claude Code Orchestrator (Windows). Interactive provider selection — DeepSeek direct (Pro/Flash), OrcaRouter free gateway, Ox Alpha via OpenRouter with 1M-token context, or any custom OpenAI-compatible base URL + model + key — then effort level (low through Ultracode) and project path, ending in a launch summary. UTF-8 console with the full Vantrilex banner; Arabic-friendly output.
+- Secret-safe by design: API keys are resolved from process environment, then a gitignored `.env.vantrilex` sidecar (opt-in save), then interactive paste — never stored in the script or the repository. Only the last 6 characters of any key are ever displayed.
+- Release tarballs (CI Build artifact and GitHub release asset) now include `vantrilex.ps1` and `AGENTS.md`.
+
+### Fixed
+
+- The English README version badge had lagged releases (still 1.3.1 after v1.4.0); the ship-gate consistency check now runs as a mandatory pre-release step so changelog, both badges, and the CLI can no longer drift apart.
+
 ## [1.4.0] - 2026-08-26
 
 The usability release: every common journey collapses to one command — machine setup, project creation, and agent entry.

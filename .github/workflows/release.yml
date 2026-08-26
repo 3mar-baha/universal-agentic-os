@@ -19,7 +19,8 @@ jobs:
         run: |
           set -e
           tar -czf "universal-agentic-os-${GITHUB_REF_NAME}.tar.gz" \
-            CLAUDE.md CHANGELOG.md CONTRIBUTING.md LICENSE README.md README.ar.md \
+            CLAUDE.md AGENTS.md CHANGELOG.md CONTRIBUTING.md LICENSE README.md README.ar.md \
+            vantrilex.ps1 \
             .editorconfig .gitattributes .gitignore .env.example .markdownlint.jsonc \
             .mcp.json docs skills scripts .claude .githooks .github .devcontainer
 

@@ -219,5 +219,6 @@ graph TD
     ROOT --> n18["docs/ (10 files)"]
     ROOT --> n19["scripts/ (14 files)"]
     ROOT --> n20["skills/ (7 files)"]
+    ROOT --> n21["vantrilex.ps1"]
 ```
 <!-- uos:graph:end -->
