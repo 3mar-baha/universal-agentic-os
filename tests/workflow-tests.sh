@@ -46,10 +46,13 @@ trap 'rm -rf "$TMP"' EXIT
 # ======================================================================
 section "T1 uos new — scaffold, vendoring, first commit"
 # ======================================================================
-if bash "${REPO_ROOT}/scripts/new-project.sh" demo "$TMP" > /dev/null 2>&1; then
+np_out="$(bash "${REPO_ROOT}/scripts/new-project.sh" demo "$TMP" 2>&1)"
+np_rc=$?
+if [ "$np_rc" -eq 0 ]; then
     ok "new-project.sh exits 0"
 else
-    bad "new-project.sh exited non-zero"
+    bad "new-project.sh exited non-zero (${np_rc}); output:"
+    printf '%s\n' "$np_out" | tail -6
 fi
 D="${TMP}/demo"
 # CI runners ship without a global git identity; every commit context below
@@ -75,10 +78,13 @@ fi
 # ======================================================================
 section "T2 uos init — bootstrap inside the scaffolded project"
 # ======================================================================
-if (cd "$D" && bash scripts/init.sh > /dev/null 2>&1); then
+init_out="$(cd "$D" && bash scripts/init.sh 2>&1)"
+init_rc=$?
+if [ "$init_rc" -eq 0 ]; then
     ok "init.sh completes"
 else
-    bad "init.sh failed"
+    bad "init.sh failed (${init_rc}); output:"
+    printf '%s\n' "$init_out" | tail -8
 fi
 if [ "$(git -C "$D" config core.hooksPath)" = ".githooks" ]; then
     ok "git hooks activated in project"
