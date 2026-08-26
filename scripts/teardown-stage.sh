@@ -9,6 +9,7 @@
 #   - .claude/agents/*  (injected specialist agents)
 #   .claude/hooks/stage-*.sh (ephemeral stage hooks)
 #   - .claude/.strike_tracker (circuit-breaker strike state)
+#   - .claude/hooks/ecc/ (vendored upstream ECC lifecycle hooks)
 #   - .claude/spec-index.md (spec ingestion index)
 #   - empty .worktrees/ directory left by stream dispatching
 #
@@ -53,7 +54,8 @@ main() {
 
     for target in \
         "${REPO_ROOT}/.claude/skills" \
-        "${REPO_ROOT}/.claude/agents"; do
+        "${REPO_ROOT}/.claude/agents" \
+        "${REPO_ROOT}/.claude/hooks/ecc"; do
         if [ -d "$target" ]; then
             rm -rf "$target"
             removed=$((removed + 1))

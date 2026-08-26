@@ -2,6 +2,25 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
 
+## [1.3.0] - 2026-08-26
+
+Level-3 agentic maturity: pinned MCP protocol, upstream ECC lifecycle integration, a live architecture graph, an automated ADR ledger, and one-command sandbox parity.
+
+### Added
+
+- `.mcp.json`: turnkey protocol enforcement pinning five core MCP servers — `fetch`, `brave-search`, `sequential-thinking`, `filesystem`, `git` — committed with placeholders only; credentials referenced by environment variable name (`BRAVE_API_KEY`), never value.
+- `scripts/generate-graph.sh` + `uos graph [--check]`: live Mermaid sync engine. Scans the repo's top-level structure (tracked-file counts only, so ephemeral injected context never stales the graph) and synchronizes it into the architecture document between `uos:graph:start/end` markers; auto-detects `docs/04-ARCHITECTURE.md` (16-doc suite layout), `docs/01-ARCHITECTURE.md` (canonical scaffold), or `docs/00-ARCHITECTURE-GUIDE.md` (this repository). Regeneration is byte-idempotent; `--check` exits 1 on stale graphs.
+- `scripts/record-decision.sh` + `uos decide <TITLE> [--status|--context|--decision|--consequences]`: append-only ADR ledger auto-detected at `docs/09-DECISIONS.md` or `docs/03-DECISIONS.md` (created with the canonical header on first use); seeded with this release's three architecture records.
+- Upstream ECC lifecycle-hook integration: `scripts/orchestrate-stage.sh` now vendors everything-claude-code's dependency-free bash hooks (`session-start`, `session-end`, `pre-compact`, `suggest-compact`) into ephemeral `.claude/hooks/ecc/` on every phase; the native `session_start` hook surfaces ECC context in its banner and the native `session_end` hook persists session memory before teardown removes the vendored copies. Dispatched worktrees run their own orchestration, so propagation to parallel Implementers is automatic.
+- `.devcontainer/`: tailored Ubuntu 24.04 Dockerfile (shellcheck, jq) plus `devcontainer.json` with Node LTS and GitHub CLI features and a `postCreateCommand` that provisions all 6 toolkits and activates git hooks.
+- CI: graph-sync idempotency/staleness and ADR-ledger append covered by the Test job.
+
+### Changed
+
+- `uos` CLI is now v1.3.0: new `graph` and `decide` commands documented in both READMEs.
+- `skills/universal-agentic-workflow.md` documents the human-Leader instantiation of the tripartite model, the ECC hook machinery, the MCP baseline, sandbox parity, and the new commands; reading order covers the 16-doc specification-suite layout.
+- `docs/05-INITIAL-PROMPT.md` now serves both specification layouts: OS-guide repositories and 16-doc spec-suite projects, with per-document extraction targets (stack from 03, milestone DAG from 07, threat model from 12, …), DAG seeding from `07-IMPLEMENTATION-PLAN.md`, and archive-first checkpoint anchoring.
+
 ## [1.2.0] - 2026-08-26
 
 The Universal Meta-Skill and the turnkey master initial project prompt — any AI agent, in any harness, now reaches full operating comprehension of the OS from two artifacts.

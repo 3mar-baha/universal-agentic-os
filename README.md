@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -88,6 +88,8 @@ claude
 
 Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 
+Sessions run with a pinned MCP baseline — [`.mcp.json`](.mcp.json) enforces five core servers (`fetch`, `brave-search`, `sequential-thinking`, `filesystem`, `git`; credentials by environment variable name only) — and [.devcontainer/](.devcontainer/) gives one-command environment parity for local and cloud sandboxes, preloading all 6 toolkits via `postCreateCommand`.
+
 Starting from a repository already seeded with the OS scaffold? [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) is the turnkey master initial project prompt — paste it into any fresh agent session to verify the 6-toolkit centralized toolkit, ingest and validate the existing specs, wire the hooks and the `uos` CLI, generate the project-tailored `CLAUDE.md`, anchor the checkpoint, and begin Phase 2 TDD immediately.
 
 ## The `uos` CLI
@@ -100,6 +102,8 @@ One entry point over everything above. Install it with `bash scripts/uos.sh inst
 | `uos plan` | Prints the checkpoint milestone DAG as dispatchable workstreams |
 | `uos dispatch <stream> [phase]` | Provisions an isolated git worktree at `.worktrees/<stream>` on `feature/<stream>`, pre-injected with the phase context kit |
 | `uos merge <stream> [--keep]` | Gates the stream's diff (`bash -n`, shellcheck, markdownlint), merges `--no-ff`, prunes the worktree, stamps the checkpoint |
+| `uos graph [--check]` | Syncs the repo tree into a marker-bounded Mermaid graph in the architecture doc; `--check` fails CI on stale graphs |
+| `uos decide <TITLE>` | Appends an auditable ADR to the decision log (`docs/09-DECISIONS.md` or `docs/03-DECISIONS.md`) |
 | `uos doctor` | Sub-second diagnostics: runtimes, hook wiring, API-key presence, toolkit integrity |
 | `uos ship [--release]` | Runs all local quality gates and prints the release checklist; `--release` additionally opens a draft GitHub release via `gh` for you to publish |
 | `uos status` | Compact 3-line card: active phase, active milestone, test status |

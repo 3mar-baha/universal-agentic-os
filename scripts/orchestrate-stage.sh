@@ -144,9 +144,44 @@ inject_agent() {
 purge_ephemeral_context() {
     rm -rf "$SKILLS_DEST" "$AGENTS_DEST"
     mkdir -p "$SKILLS_DEST" "$AGENTS_DEST"
-    # Ephemeral stage hooks follow the same lifecycle as injected context.
+    # Ephemeral stage hooks and vendored ECC hooks follow the same lifecycle
+    # as injected context.
     rm -f "${REPO_ROOT}/.claude/hooks/stage-"*.sh 2>/dev/null
-    log_info 'purged .claude/skills/*, .claude/agents/*, and ephemeral stage hooks'
+    rm -rf "${REPO_ROOT}/.claude/hooks/ecc"
+    log_info 'purged .claude/skills/*, .claude/agents/*, ephemeral stage hooks, and ECC hook vendoring'
+}
+
+# inject_ecc_lifecycle_hooks
+# Vendor the upstream everything-claude-code lifecycle hooks (the
+# dependency-free bash variants) into the ephemeral .claude/hooks/ecc
+# directory. The native session_start/session_end hooks invoke them when
+# present, so upstream context persistence rides the OS's own lifecycle
+# events without touching tracked settings.
+inject_ecc_lifecycle_hooks() {
+    local src_base="${TOOLKIT_DIR}/everything-claude-code/hooks"
+    local pair src dest_name
+
+    mkdir -p "${REPO_ROOT}/.claude/hooks/ecc"
+    for pair in \
+        "memory-persistence/session-start.sh:session-start.sh" \
+        "memory-persistence/session-end.sh:session-end.sh" \
+        "memory-persistence/pre-compact.sh:pre-compact.sh" \
+        "strategic-compact/suggest-compact.sh:suggest-compact.sh"; do
+        src="${src_base}/${pair%%:*}"
+        dest_name="${pair##*:}"
+        if [ ! -e "$src" ]; then
+            log_warn "missing ECC hook asset, skipped: $src"
+            WARNED=$((WARNED + 1))
+            continue
+        fi
+        if ! cp "$src" "${REPO_ROOT}/.claude/hooks/ecc/${dest_name}"; then
+            log_error "copy failed: $src -> ${REPO_ROOT}/.claude/hooks/ecc/${dest_name}"
+            FAILED=$((FAILED + 1))
+            continue
+        fi
+        INJECTED=$((INJECTED + 1))
+        printf '[orchestrate] + ecc-hook %s\n' "$dest_name"
+    done
 }
 
 # select_language_specialist
@@ -287,6 +322,9 @@ main() {
         3) orchestrate_phase_3 ;;
         4) orchestrate_phase_4 ;;
     esac
+
+    # Lifecycle-wide: ECC context persistence rides every phase, not one.
+    inject_ecc_lifecycle_hooks
 
     print_inventory
 

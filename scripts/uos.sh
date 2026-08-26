@@ -12,6 +12,10 @@
 #                         gate, --no-ff merge, and prune one stream
 #                         (scripts/merge-worktrees.sh)
 #   uos doctor            sub-second environment diagnostics
+#   uos graph [--check]   sync the repo tree into the architecture doc's
+#                         Mermaid graph (scripts/generate-graph.sh)
+#   uos decide <TITLE>    append an ADR to the decision log
+#                         (scripts/record-decision.sh)
 #   uos ship [--release]  run all local quality gates and prepare a GitHub
 #                         release (--release creates a DRAFT via gh; you
 #                         publish it)
@@ -40,7 +44,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$UOS_SOURCE")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHECKPOINT="${REPO_ROOT}/docs/10-CHECKPOINT.md"
-UOS_VERSION="1.2.0"
+UOS_VERSION="1.3.0"
 
 usage() {
     sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,20p'
@@ -328,6 +332,8 @@ main() {
         ingest)   exec bash "${SCRIPT_DIR}/ingest-specs.sh" "$@" ;;
         plan)     cmd_plan "$@" ;;
         dispatch) exec bash "${SCRIPT_DIR}/dispatch-worktrees.sh" "$@" ;;
+        graph)    exec bash "${SCRIPT_DIR}/generate-graph.sh" "$@" ;;
+        decide)   exec bash "${SCRIPT_DIR}/record-decision.sh" "$@" ;;
         merge)    exec bash "${SCRIPT_DIR}/merge-worktrees.sh" "$@" ;;
         doctor)   cmd_doctor "$@" ;;
         ship)     cmd_ship "$@" ;;

@@ -39,6 +39,7 @@ emit_banner() {
     local status="$1"
     local phase="$2"
     local kit_line="$3"
+    local ecc_line="${4:-}"
 
     cat <<EOF
 =======================================================================
@@ -48,6 +49,7 @@ emit_banner() {
  status        : ${status}
  active phase  : ${phase} - $(phase_name "$phase")
  context kit   : ${kit_line:-orchestrator output unavailable}
+ ecc context   : ${ecc_line:-(not vendored)}
 -----------------------------------------------------------------------
  autonomy      : resume the active milestone DAG immediately.
                  strict TDD; no confirmation prompts; archive completed
@@ -72,6 +74,7 @@ main() {
     local phase
     local orchestrate_out
     local kit_line
+    local ecc_line=""
 
     status="$(read_checkpoint_field 'status')"
     status="${status:-UNKNOWN}"
@@ -96,7 +99,18 @@ main() {
         printf '%s\n' "$orchestrate_out" >&2
     fi
 
-    emit_banner "$status" "$phase" "$kit_line"
+    # Upstream ECC context persistence (vendored by orchestration). Best
+    # effort only: this hook must never break a session.
+    if [ -f "${REPO_ROOT}/.claude/hooks/ecc/session-start.sh" ]; then
+        if ecc_line="$(bash "${REPO_ROOT}/.claude/hooks/ecc/session-start.sh" 2>&1 \
+            | grep '\[SessionStart\]' | tail -n 1 | sed 's/^\[SessionStart\] //')"; then
+            [ -n "$ecc_line" ] || ecc_line="(vendored, no recent context)"
+        else
+            ecc_line="(vendored, probe failed)"
+        fi
+    fi
+
+    emit_banner "$status" "$phase" "$kit_line" "$ecc_line"
     exit 0
 }
 

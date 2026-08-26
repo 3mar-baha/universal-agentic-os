@@ -13,6 +13,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 main() {
+    # Upstream ECC memory persistence (vendored by orchestration) runs before
+    # teardown removes it. Best effort only: never block session exit.
+    if [ -f "${REPO_ROOT}/.claude/hooks/ecc/session-end.sh" ]; then
+        if ! bash "${REPO_ROOT}/.claude/hooks/ecc/session-end.sh" >&2; then
+            printf '[session-end] WARN: ECC session-end failed; continuing.\n' >&2
+        fi
+    fi
+
     printf '[session-end] running ephemeral teardown...\n'
     if bash "${REPO_ROOT}/scripts/teardown-stage.sh"; then
         printf '[session-end] teardown complete; context is phase-neutral.\n'

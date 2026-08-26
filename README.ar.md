@@ -7,7 +7,7 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -88,6 +88,8 @@ claude
 
 حافظ على تحديث حزمة الأدوات بالأمر `bash scripts/sync-toolkit.sh`.
 
+تُشغَّل الجلسات على أساس بروتوكول MCP مثبّت — يفرض ملف [`.mcp.json`](.mcp.json) خمسة خوادم أساسية (`fetch` و`brave-search` و`sequential-thinking` و`filesystem` و`git`؛ والاعتمادات بأسماء متغيرات البيئة فقط) — ويمنح [.devcontainer/](.devcontainer/) تكافؤ بيئة بأمر واحد للصناديق المحلية والسحابية، محمّلًا سلفًا بحزم الأدوات الستّ عبر `postCreateCommand`.
+
 تبدأ من مستودع مهيّأ سلفًا بهيكل النظام؟ ملف [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) هو الموجّه الافتتاحي الشامل للمشاريع — الصقه في أي جلسة وكيل جديدة للتحقق من حزمة الأدوات المركزية ذات الحزم الستّ، وابتلاع المواصفات الموجودة والتحقق منها، وتوصيل الخطّافات وواجهة `uos`، وتوليد `CLAUDE.md` مفصّل على المشروع، وتثبيت الـ checkpoint، ثم البدء فورًا ببناء المرحلة 2 عبر TDD.
 
 ## واجهة `uos` السطرية
@@ -100,6 +102,8 @@ claude
 | `uos plan` | يعرض مخطط معالم الـ checkpoint على شكل مسارات عمل قابلة للتوزيع |
 | `uos dispatch <stream> [phase]` | يؤمّن شجرة عمل git معزولة في `.worktrees/<stream>` على الفرع `feature/<stream>`، محمّلة سلفًا بحزمة سياق المرحلة |
 | `uos merge <stream> [--keep]` | يفحص فروقات المسار (`bash -n` وshellcheck وmarkdownlint)، يدمج بـ `--no-ff`، ينظّف الشجرة، ويختم الـ checkpoint |
+| `uos graph [--check]` | يزامن شجرة المستودع داخل مخطط Mermaid محدود بمؤشرات في مستند المعمارية؛ ويفشل `--check` عند تقادم المخطط |
+| `uos decide <TITLE>` | يُلحق سجل قرار معماري (ADR) قابلًا للتدقيق بسجل القرارات (`docs/09-DECISIONS.md` أو `docs/03-DECISIONS.md`) |
 | `uos doctor` | تشخيصات بيئة خلال أجزاء من الثانية: بيئات التشغيل، ربط الخطّافات، وجود مفاتيح API، سلامة حزمة الأدوات |
 | `uos ship [--release]` | يشغّل كل بوابات الجودة المحلية ويطبع قائمة الإصدار؛ وخيار `--release` يفتح مسودة إصدار GitHub عبر `gh` لتنشرها أنت |
 | `uos status` | بطاقة ASCII مكوّنة من ثلاثة أسطر: المرحلة النشطة، المعلَمة النشطة، حالة الاختبارات |

@@ -252,6 +252,24 @@ jobs:
           bash scripts/uos.sh ingest > /dev/null
           echo "ingest failure path verified"
 
+      - name: Graph sync and ADR ledger
+        run: |
+          set -e
+          bash scripts/generate-graph.sh
+          bash scripts/generate-graph.sh --check
+          grep -q 'uos:graph:start' docs/00-ARCHITECTURE-GUIDE.md
+          # A stale tree must trip --check.
+          mkdir extra-dir-for-staleness
+          if bash scripts/generate-graph.sh --check > /dev/null 2>&1; then
+            echo "--check should have failed on a stale graph"; exit 1
+          fi
+          rmdir extra-dir-for-staleness
+          bash scripts/uos.sh decide "CI fixture decision" --decision "verified by CI"
+          grep -q '^## ADR-001' docs/03-DECISIONS.md
+          git checkout -- docs/00-ARCHITECTURE-GUIDE.md 2> /dev/null || true
+          rm -f docs/03-DECISIONS.md
+          echo "graph sync + ADR ledger behave to contract"
+
   build:
     name: Build
     needs: [lint, test]

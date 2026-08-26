@@ -1,0 +1,24 @@
+{
+  "name": "Universal Agentic Engineering OS",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "bash scripts/setup-toolkit.sh && bash scripts/setup-git-hooks.sh",
+  "remoteEnv": {
+    "CLAUDE_TOOLKIT_DIR": "/home/vscode/ai-agent-toolkit"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "editorconfig.editorconfig",
+        "timonwong.shellcheck"
+      ]
+    }
+  }
+}

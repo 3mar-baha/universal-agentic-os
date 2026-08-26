@@ -37,6 +37,11 @@ are prohibited. The Guide either approves a changed hypothesis (strikes reset) o
 narrowly scoped third attempt. Strike 3: HALT all execution immediately, emit a Diagnostic Incident
 Report (DIR), and hand it to the Leader to re-plan or abort. Never attempt a blind fourth fix.
 
+Common instantiation in agent sessions: the human Leader holds vision, veto, and release
+authorization while the AI agent operates the Leader's decomposition and routing duties alongside
+Implementer work — always under Guide gates (spec sign-off, phase exits, changed hypotheses). The
+roles are duties, not headcount; decision rights never merge regardless of who executes them.
+
 ## 2. The 4-Phase Lifecycle and Stage Orchestration
 
 The executable stage machine — what `ACTIVE_PHASE` in `docs/10-CHECKPOINT.md`, the session-start
@@ -152,6 +157,15 @@ The machinery that enforces them:
   assignments, literal `.env` files, and AI-attribution markers. Never bypass with `--no-verify`.
 - **Strict zero AI attribution** — no `Co-authored-by` trailers, no "Generated with" footers, no
   agent badges; `.githooks/pre-commit` and `.githooks/commit-msg` enforce this at commit time.
+- **Upstream ECC lifecycle hooks** — stage orchestration vendors the dependency-free bash hooks
+  from `everything-claude-code` into ephemeral `.claude/hooks/ecc/`; the native session-start and
+  session-end hooks invoke them when present (context persistence across sessions). Because
+  dispatched worktrees run their own orchestration, the vendored hooks propagate to every parallel
+  Implementer automatically.
+- **MCP protocol and sandbox parity** — `.mcp.json` pins the five core MCP servers (`fetch`,
+  `brave-search`, `sequential-thinking`, `filesystem`, `git`; secrets referenced by environment
+  variable only), and `.devcontainer/` provides one-command environment parity with all 6 toolkits
+  preloaded via `postCreateCommand`.
 
 ## 6. Command Surface
 
@@ -164,13 +178,18 @@ The `uos` CLI (`scripts/uos.sh`, install with `uos install`) wraps every operati
 | `uos dispatch <stream> [phase]` | Provision an isolated worktree pre-injected with the phase kit |
 | `uos merge <stream> [--keep]` | Gate, `--no-ff` merge, prune, and stamp one stream |
 | `uos doctor` | Sub-second environment, hook-wiring, API-key-presence, toolkit-integrity diagnostics |
+| `uos graph [--check]` | Sync the repo tree into the architecture doc's marker-bounded Mermaid graph; `--check` fails on stale graphs |
+| `uos decide <TITLE>` | Append an auditable ADR to the decision log (auto-detected: `docs/09-DECISIONS.md` or `docs/03-DECISIONS.md`) |
 | `uos ship [--release]` | Run all local quality gates and print (or draft) the release |
 | `uos status` | Compact 3-line card: phase, milestone, test state, toolkit state |
 
 ## 7. Reading Order and Precedence
 
 Read, in order: `CLAUDE.md` → this skill → `docs/10-CHECKPOINT.md` → the routed task's documents
-(`uos ingest` builds the index). When artifacts disagree:
+(`uos ingest` builds the index). Repositories seeded with the 16-doc specification suite
+(`01-PRODUCT-REQUIREMENTS.md` … `13-DEPLOYMENT.md`) read that suite instead of guide-specific
+documents: stack and constraints from `03-TECHNICAL-SPECIFICATION.md`, milestone DAG from
+`07-IMPLEMENTATION-PLAN.md`, testing thresholds from `11-TESTING.md`. When artifacts disagree:
 
 ```
 CLAUDE.md invariants  >  docs guides  >  skills  >  code comments

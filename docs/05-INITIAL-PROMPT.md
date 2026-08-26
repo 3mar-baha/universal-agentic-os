@@ -57,9 +57,18 @@ regenerate, or "improve" them without a Guide-approved amendment. Run:
     bash scripts/uos.sh ingest
 It parses every specification document, cross-references links and script mentions, and fails on
 any broken reference. If ingestion fails, STOP and report the exact broken references — do not fix
-specs unilaterally. Then deep-read each document (architecture guide, domain archetypes, toolkit
-and Orca guide, worktree protocol, quality gates and safety, engineering pillars, checkpoint) and
-restate, in three sentences or fewer, the mission in effect and the active lifecycle phase.
+specs unilaterally. Then deep-read every document according to which specification layout this
+repository carries, and restate, in three sentences or fewer, the mission in effect and the active
+lifecycle phase.
+- OS-guide layout (00 through 06 plus 10): read the architecture guide, domain archetypes, toolkit
+  and Orca guide, worktree protocol, quality gates and safety, engineering pillars, checkpoint.
+- 16-doc specification suite (01-PRODUCT-REQUIREMENTS.md through 13-DEPLOYMENT.md): extract core
+  invariants, personas, and scope from 01; workflow logic and edge cases from 02; exact stack,
+  language versions, and hard constraints from 03; topology and component contracts from 04;
+  entity schemas from 05; endpoint contracts from 06; the phased milestone DAG from
+  07-IMPLEMENTATION-PLAN.md; ADR trade-offs from 09-DECISIONS.md when present; testing matrix and
+  coverage thresholds from 11; threat model from 12; deployment targets and CI/CD parameters from
+  13. Validate consistency across the whole suite before building anything.
 
 4. WIRE THE EXECUTION MACHINERY
 Verify the OS machinery is present and armed; create only what is genuinely missing, exactly per
@@ -90,7 +99,10 @@ Bring docs/10-CHECKPOINT.md to a resumable state (keep it under 50 lines):
 - status: ACTIVE, ACTIVE_PHASE matching the verified reality (default 2 when specs exist).
 - Mission In Effect — restated from the specifications.
 - Milestone DAG — decompose the mission into testable milestones, each independently dispatchable
-  to a workstream. Completed milestones archive to docs/archive/.
+  to a workstream. When docs/07-IMPLEMENTATION-PLAN.md exists, its phased plan IS the DAG: seed
+  the first open phase's items as milestones rather than inventing a parallel plan. Completed
+  milestones archive to docs/archive/ — if the checkpoint already holds substantive state for
+  shipped work, archive it first and never delete it.
 
 7. BEGIN PHASE 2 IMMEDIATELY (Core Build & TDD)
 With verification green and the checkpoint anchored, start building — no further prompts:

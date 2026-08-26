@@ -191,3 +191,31 @@ universal-agentic-os/
 - Role separation holds here too: routing and sequencing decisions live in the roadmap and backlog, specification and gate ownership sit with the reviewing side, and implementation lands as small diffs gated by `.github/workflows/ci.yml`.
 - The 6 operational core skills — `agentic-project-launcher`, `claude-stage-orchestrator`, `session-context-primer`, `circuit-breaker-guard`, `preflight-system-doctor`, `github-release-packager` — are the executable form of the rules in this guide. The seventh skill, `universal-agentic-workflow`, is the Universal Meta-Skill: the agent-facing entry point that condenses this entire guide set into one operating manual so any AI agent reaches complete comprehension at session start.
 - Upstream toolkits stay centralized under `CLAUDE_TOOLKIT_DIR` (default `~/ai-agent-toolkit`) and are managed exclusively by `scripts/setup-toolkit.sh` and `scripts/sync-toolkit.sh`.
+
+## Architecture Graph
+
+<!-- uos:graph:start -->
+```mermaid
+graph TD
+    ROOT["universal-agentic-os"]
+    ROOT --> n1[".claude/ (4 files)"]
+    ROOT --> n2[".devcontainer/ (2 files)"]
+    ROOT --> n3[".editorconfig"]
+    ROOT --> n4[".env.example"]
+    ROOT --> n5[".gitattributes"]
+    ROOT --> n6[".githooks/ (2 files)"]
+    ROOT --> n7[".github/ (1 files)"]
+    ROOT --> n8[".gitignore"]
+    ROOT --> n9[".markdownlint.jsonc"]
+    ROOT --> n10[".mcp.json"]
+    ROOT --> n11["CHANGELOG.md"]
+    ROOT --> n12["CLAUDE.md"]
+    ROOT --> n13["CONTRIBUTING.md"]
+    ROOT --> n14["LICENSE"]
+    ROOT --> n15["README.ar.md"]
+    ROOT --> n16["README.md"]
+    ROOT --> n17["docs/ (10 files)"]
+    ROOT --> n18["scripts/ (11 files)"]
+    ROOT --> n19["skills/ (7 files)"]
+```
+<!-- uos:graph:end -->
