@@ -7,7 +7,7 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -75,15 +75,14 @@
 git clone https://github.com/madaar-team/universal-agentic-os.git
 cd universal-agentic-os
 
-# 2. Provision the centralized toolkit (installs the 6 upstream toolkits)
-bash scripts/setup-toolkit.sh
+# 2. تهيئة بأمر واحد: حزم الأدوات + خطّافات git + CLI على PATH + تقرير doctor
+bash scripts/uos.sh init
 
-# 3. Point the OS at the toolkit directory
-export CLAUDE_TOOLKIT_DIR="$HOME/ai-agent-toolkit"
+# 3أ. ابدأ مشروعًا جديدًا محكومًا (الهيكل القياسي + بيئة التشغيل كاملة)
+uos new my-project ~/Projects
 
-# 4. Open Claude Code and invoke the launcher skill with your mission statement
-claude
-# then: invoke the agentic-project-launcher skill
+# 3ب. ...أو اعمل داخل مستودع قائم: افتح وكيلك هناك والصق docs/05-INITIAL-PROMPT.md —
+#     والوكلاء غير Claude Code ينطلقون من AGENTS.md تلقائيًا.
 ```
 
 حافظ على تحديث حزمة الأدوات بالأمر `bash scripts/sync-toolkit.sh`.
@@ -98,6 +97,8 @@ claude
 
 | الأمر | ما يفعله |
 | --- | --- |
+| `uos init` | تهيئة الجهاز بأمر واحد: يوفّر حزم الأدوات الست ويتحقق منها، ويفعّل خطّافات git، ويثبّت CLI على PATH، ويختم بتقرير `doctor` |
+| `uos new <NAME> [DIR]` | ينشئ مشروعًا جديدًا محكومًا: الهيكل القياسي ذو الـ16 ملفًا بمحتوى بذري حقيقي، checkpoint حي، بيئة تشغيل النظام مدمجة (خطّافات، سكربتات، الميتا-سكيل، أساس MCP)، وكوميت أول |
 | `uos ingest` | يقرأ كل المواصفات في `docs/` ويطابق مراجعها المتقاطعة — قراءةً فقط؛ يكتب `.claude/spec-index.md` لتهيئة سياق الوكلاء ويفشل عند أي مرجع مكسور |
 | `uos plan` | يعرض مخطط معالم الـ checkpoint على شكل مسارات عمل قابلة للتوزيع |
 | `uos dispatch <stream> [phase]` | يؤمّن شجرة عمل git معزولة في `.worktrees/<stream>` على الفرع `feature/<stream>`، محمّلة سلفًا بحزمة سياق المرحلة |

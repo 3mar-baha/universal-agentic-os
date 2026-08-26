@@ -17,6 +17,7 @@ disagree, the guide governs and this skill is corrected (see precedence in secti
 ## When to Load
 
 - Session start, before any other action — alongside reading `CLAUDE.md` and `docs/10-CHECKPOINT.md`.
+  Agents other than Claude Code enter through the repository's `AGENTS.md`, which points here.
 - Whenever you lose track of which phase is active or which capabilities are injected.
 - Before dispatching, merging, orchestrating, or releasing anything.
 
@@ -174,6 +175,8 @@ The `uos` CLI (`scripts/uos.sh`, install with `uos install`) wraps every operati
 
 | Command | Effect |
 | --- | --- |
+| `uos init` | One-command machine bootstrap: toolkits + git hooks + CLI install + doctor report |
+| `uos new <NAME> [DIR]` | Scaffold a new governed project: canonical 16-file hierarchy, live checkpoint, vendored OS runtime, initial commit |
 | `uos ingest` | Parse and cross-reference every spec under `docs/` (read-only); write `.claude/spec-index.md` |
 | `uos plan` | Print the checkpoint milestone DAG as dispatchable streams |
 | `uos dispatch <stream> [phase]` | Provision an isolated worktree pre-injected with the phase kit |

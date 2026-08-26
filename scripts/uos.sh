@@ -1,30 +1,41 @@
 #!/usr/bin/env bash
 #
 # uos.sh — the unified developer CLI for the Universal Agentic Engineering
-# OS. One entry point over the OS's own scripts:
+# OS. One entry point over the OS's own scripts.
 #
+# FIRST TIME?        uos init              provision toolkits, hooks, CLI,
+#                                          then a doctor report
+# START A PROJECT?   uos new <NAME> [DIR]  scaffold a governed project with
+#                                          the OS runtime baked in
+#
+# SETUP & DIAGNOSIS
+#   uos init              one-command machine bootstrap (toolkits + hooks +
+#                         CLI install + doctor)
+#   uos doctor            sub-second environment diagnostics
+#   uos install           link this CLI onto PATH (~/.local/bin/uos)
+#
+# DAILY LOOP
 #   uos ingest            deep-read every spec in docs/, read-only
 #                         (scripts/ingest-specs.sh)
 #   uos plan              print the milestone DAG as dispatchable streams
+#   uos status            compact 3-line ASCII status card
 #   uos dispatch [S] [P]  provision an isolated worktree per stream
 #                         (scripts/dispatch-worktrees.sh)
 #   uos merge <S> [--keep]
 #                         gate, --no-ff merge, and prune one stream
 #                         (scripts/merge-worktrees.sh)
-#   uos doctor            sub-second environment diagnostics
-#   uos graph [--check]   sync the repo tree into the architecture doc's
-#                         Mermaid graph (scripts/generate-graph.sh)
+#
+# GOVERNANCE & RELEASE
 #   uos decide <TITLE>    append an ADR to the decision log
 #                         (scripts/record-decision.sh)
-#   uos release <X.Y.Z>   tag, push, and publish a GitHub release whose
-#                         notes are the matching CHANGELOG section
-#                         (--draft to review before publishing)
+#   uos graph [--check]   sync the repo tree into the architecture doc's
+#                         Mermaid graph (scripts/generate-graph.sh)
 #   uos ship [--release]  run all local quality gates and prepare a GitHub
 #                         release (--release creates a DRAFT via gh; you
 #                         publish it)
-#   uos status            compact 3-line ASCII status card
-#   uos install           link this CLI onto PATH (~/.local/bin/uos)
-#   uos help              this help
+#   uos release <X.Y.Z>   tag, push, and publish a GitHub release whose
+#                         notes are the matching CHANGELOG section
+#                         (--draft to review before publishing)
 #
 # Exit status:
 #   0 — command succeeded
@@ -47,10 +58,10 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$UOS_SOURCE")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHECKPOINT="${REPO_ROOT}/docs/10-CHECKPOINT.md"
-UOS_VERSION="1.3.1"
+UOS_VERSION="1.4.0"
 
 usage() {
-    sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,20p'
+    sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,35p'
 }
 
 read_checkpoint_field() {
@@ -368,6 +379,8 @@ main() {
         release)  exec bash "${SCRIPT_DIR}/release.sh" "$@" ;;
         merge)    exec bash "${SCRIPT_DIR}/merge-worktrees.sh" "$@" ;;
         doctor)   cmd_doctor "$@" ;;
+        init)     exec bash "${SCRIPT_DIR}/init.sh" "$@" ;;
+        new)      exec bash "${SCRIPT_DIR}/new-project.sh" "$@" ;;
         ship)     cmd_ship "$@" ;;
         status)   cmd_status "$@" ;;
         install)  cmd_install "$@" ;;

@@ -175,6 +175,7 @@ The OS is built with its own rules:
 ```
 universal-agentic-os/
 ├── CLAUDE.md                     <- operating contract
+├── AGENTS.md                     <- entry point for any non-Claude agent
 ├── README.md / README.ar.md     <- English primary, full Arabic translation
 ├── LICENSE                       <- MIT, (c) 2026 Madaar Team
 ├── CONTRIBUTING.md, CHANGELOG.md
@@ -208,14 +209,15 @@ graph TD
     ROOT --> n8[".gitignore"]
     ROOT --> n9[".markdownlint.jsonc"]
     ROOT --> n10[".mcp.json"]
-    ROOT --> n11["CHANGELOG.md"]
-    ROOT --> n12["CLAUDE.md"]
-    ROOT --> n13["CONTRIBUTING.md"]
-    ROOT --> n14["LICENSE"]
-    ROOT --> n15["README.ar.md"]
-    ROOT --> n16["README.md"]
-    ROOT --> n17["docs/ (10 files)"]
-    ROOT --> n18["scripts/ (12 files)"]
-    ROOT --> n19["skills/ (7 files)"]
+    ROOT --> n11["AGENTS.md"]
+    ROOT --> n12["CHANGELOG.md"]
+    ROOT --> n13["CLAUDE.md"]
+    ROOT --> n14["CONTRIBUTING.md"]
+    ROOT --> n15["LICENSE"]
+    ROOT --> n16["README.ar.md"]
+    ROOT --> n17["README.md"]
+    ROOT --> n18["docs/ (10 files)"]
+    ROOT --> n19["scripts/ (14 files)"]
+    ROOT --> n20["skills/ (7 files)"]
 ```
 <!-- uos:graph:end -->

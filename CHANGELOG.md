@@ -2,6 +2,22 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
 
+## [1.4.0] - 2026-08-26
+
+The usability release: every common journey collapses to one command — machine setup, project creation, and agent entry.
+
+### Added
+
+- `scripts/init.sh` + `uos init`: one-command machine bootstrap. Provisions and verifies the 6-toolkit directory, activates git hooks, installs the CLI onto PATH, prints the `CLAUDE_TOOLKIT_DIR` export hint when unset, and finishes with a full `uos doctor` report. Idempotent.
+- `scripts/new-project.sh` + `uos new <NAME> [DIR]`: scaffolds a brand-new governed project — the canonical 16-file hierarchy with real seed content, the live `docs/10-CHECKPOINT.md`, and a vendored OS runtime (native hooks + settings, all lifecycle scripts, the Universal Meta-Skill, `.mcp.json`, lint config) — then initializes git with a clean first commit. The result is immediately ready for the master initial prompt.
+- `AGENTS.md` at the repository root: a four-item entry point for agents other than Claude Code (Cursor, Codex, Windsurf) — constitution, meta-skill, checkpoint protocol, command surface.
+- Guided `uos help`: commands grouped into Setup & Diagnosis / Daily Loop / Governance & Release, with FIRST TIME? and START A PROJECT? pointers at the top.
+
+### Changed
+
+- README quick starts (English and Arabic) collapse from four setup steps to `uos init`.
+- The architecture guide's repository map includes `AGENTS.md`.
+
 ## [1.3.1] - 2026-08-26
 
 Six small gates and one big shortcut — each closes a gap observed in practice during the v1.2.0/v1.3.0 ships.

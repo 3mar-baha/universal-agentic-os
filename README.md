@@ -75,15 +75,15 @@ The Leader routes every task; the Guide specifies it and sets the gates; Impleme
 git clone https://github.com/madaar-team/universal-agentic-os.git
 cd universal-agentic-os
 
-# 2. Provision the centralized toolkit (installs the 6 upstream toolkits)
-bash scripts/setup-toolkit.sh
+# 2. One-command bootstrap: toolkits + git hooks + CLI on PATH + doctor report
+bash scripts/uos.sh init
 
-# 3. Point the OS at the toolkit directory
-export CLAUDE_TOOLKIT_DIR="$HOME/ai-agent-toolkit"
+# 3a. Start a brand-new governed project (canonical scaffold + OS runtime)
+uos new my-project ~/Projects
 
-# 4. Open Claude Code and invoke the launcher skill with your mission statement
-claude
-# then: invoke the agentic-project-launcher skill
+# 3b. ...or work inside an existing repository: open your agent there and
+#     paste docs/05-INITIAL-PROMPT.md — agents other than Claude Code start
+#     from AGENTS.md automatically.
 ```
 
 Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
@@ -98,6 +98,8 @@ One entry point over everything above. Install it with `bash scripts/uos.sh inst
 
 | Command | What it does |
 | --- | --- |
+| `uos init` | One-command machine bootstrap: provisions and verifies the 6 toolkits, activates git hooks, installs the CLI onto PATH, ends with a `doctor` report |
+| `uos new <NAME> [DIR]` | Scaffolds a brand-new governed project: canonical 16-file hierarchy with real seed content, live checkpoint, vendored OS runtime (hooks, scripts, meta-skill, MCP baseline), initial commit |
 | `uos ingest` | Parses and cross-references every spec in `docs/`, read-only; writes `.claude/spec-index.md` for context priming and fails on broken references |
 | `uos plan` | Prints the checkpoint milestone DAG as dispatchable workstreams |
 | `uos dispatch <stream> [phase]` | Provisions an isolated git worktree at `.worktrees/<stream>` on `feature/<stream>`, pre-injected with the phase context kit |
