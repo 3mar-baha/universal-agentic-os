@@ -116,8 +116,9 @@ Leader for merge sequencing.
 | 3. Implement & Verify | claude-stage-orchestrator, circuit-breaker-guard (active) | mattpocock-skills (TypeScript/DX repos), everything-claude-code (workflow subset) | Design-only kits |
 | 4. Harden & Release | circuit-breaker-guard (active), preflight-system-doctor, github-release-packager | guard-skills, cybersecurity-skills | Implementation kits, before packaging |
 
-The six framework core skills above are the framework's complete skill set; nothing else ships in
-skills/.
+The six framework core skills above are joined by the `universal-agentic-workflow` meta-skill — the
+agent-facing operating manual that condenses every guide into one load-once document; nothing else
+ships in skills/.
 
 Three inputs drive every injection decision:
 

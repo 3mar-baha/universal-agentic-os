@@ -7,8 +7,8 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Skills](https://img.shields.io/badge/skills-6-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
 
@@ -88,7 +88,7 @@ claude
 
 حافظ على تحديث حزمة الأدوات بالأمر `bash scripts/sync-toolkit.sh`.
 
-تبدأ مشروعًا جديدًا تمامًا؟ ملف [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) هو الموجّه المستقل للمشاريع الجديدة — الصقه في أي جلسة Claude Code جديدة لتشغيل مرحلة الاكتشاف والإطلاق بالصرامة نفسها، دون أي إعداد محلي.
+تبدأ من مستودع مهيّأ سلفًا بهيكل النظام؟ ملف [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) هو الموجّه الافتتاحي الشامل للمشاريع — الصقه في أي جلسة وكيل جديدة للتحقق من حزمة الأدوات المركزية ذات الحزم الستّ، وابتلاع المواصفات الموجودة والتحقق منها، وتوصيل الخطّافات وواجهة `uos`، وتوليد `CLAUDE.md` مفصّل على المشروع، وتثبيت الـ checkpoint، ثم البدء فورًا ببناء المرحلة 2 عبر TDD.
 
 ## واجهة `uos` السطرية
 
@@ -106,10 +106,11 @@ claude
 
 ## المهارات المضمّنة
 
-تأتي مع النظام ست مهارات أساسية، وهي الصورة التنفيذية لقواعده.
+تأتي مع النظام سبع مهارات أساسية، وهي الصورة التنفيذية لقواعده — ست مهارات تشغيلية إضافة إلى المهارة الفوقية الشاملة التي تمنح أي وكيل ذكاء اصطناعي استيعابًا كاملًا لها جميعًا.
 
 | المهارة | ما تفعله | مرحلة دورة الحياة |
 | --- | --- | --- |
+| [`universal-agentic-workflow`](skills/universal-agentic-workflow.md) | المهارة الفوقية الشاملة: دليل التشغيل الكامل للنظام — النموذج الثلاثي، دورة الحياة رباعية المراحل، تدوير حزم الأدوات الستّ، أشجار العمل المتوازية، وكل الثوابت وبوابات السلامة | تُحمَّل مرة واحدة عند بدء الجلسة، في كل المراحل |
 | [`agentic-project-launcher`](skills/agentic-project-launcher.md) | تُشغّل الاكتشاف السقراطي، وتُكمل التحقق من مسار النشر، وتُنشئ الهيكل القياسي المكوّن من 16 ملفًا | 1. الاكتشاف والإطلاق |
 | [`claude-stage-orchestrator`](skills/claude-stage-orchestrator.md) | تُحقن عبر Orca ADE المهارات وأصول حزمة الأدوات والمستندات التي تحتاجها المرحلة تحديدًا — وتُقلّم الباقي | الانتقال بين المراحل في المراحل الأربع جميعها |
 | [`session-context-primer`](skills/session-context-primer.md) | تُعيد بناء سياق العمل الأساسي في نحو عشر ثوانٍ عند بداية الجلسة، وتُصدر كتلة CONTEXT ANCHOR | تهيئة الجلسة، في كل مرحلة |
@@ -128,7 +129,7 @@ claude
 | [`docs/02-TOOLKIT-AND-ORCA-GUIDE.md`](docs/02-TOOLKIT-AND-ORCA-GUIDE.md) | حزمة الأدوات المركزية ضمن `CLAUDE_TOOLKIT_DIR`، وحزم الأدوات الستة المصدرية، وطبقة تشغيل Orca ADE |
 | [`docs/03-ORCA-WORKTREES-AND-PARALLEL-AGENTS.md`](docs/03-ORCA-WORKTREES-AND-PARALLEL-AGENTS.md) | مجمّع git worktree: قواعد العزل، وموضوع واحد لكل worktree، والدمج المُراجَع من المنفّذين المتوازيين |
 | [`docs/04-QUALITY-GATES-AND-SAFETY.md`](docs/04-QUALITY-GATES-AND-SAFETY.md) | بوابات الجودة والسلامة: حرّاس المراجعة الثانية، وسياسة قاطع الدائرة، والتعامل مع الأسرار، وخط الأساس الأمني |
-| [`docs/05-INITIAL-PROMPT.md`](docs/05-INITIAL-PROMPT.md) | الموجّه الافتتاحي المستقل لإطلاق مشروع جديد باستخدام النظام |
+| [`docs/05-INITIAL-PROMPT.md`](docs/05-INITIAL-PROMPT.md) | الموجّه الافتتاحي الشامل: التحقق من حزمة الأدوات، وابتلاع المواصفات، وتوصيل الآليات، وتوليد `CLAUDE.md` مفصّل، وتثبيت الـ checkpoint، وبدء المرحلة 2 عبر TDD فورًا |
 | [`docs/06-ENGINEERING-PILLARS.md`](docs/06-ENGINEERING-PILLARS.md) | الركائز الهندسية العشر، وكيف يُفعّلها كل دور ومرحلة ومهارة وحارس عمليًا |
 
 ## تعدد المجالات

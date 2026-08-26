@@ -79,7 +79,7 @@ check_references() {
             log_error "$name links to missing file: $target"
             printf 'FAIL\n'
         fi
-    done < <(grep -oE '\]\(([^)]+)\)' "$path" | sed -e 's/^\]//' -e 's/)$//' | sort -u)
+    done < <(grep -oE '\]\(([^)]+)\)' "$path" | sed -e 's/^\]//' -e 's/^(//' -e 's/)$//' | sort -u)
 
     # Explicit script mentions: scripts/foo.sh must exist.
     while IFS= read -r target; do

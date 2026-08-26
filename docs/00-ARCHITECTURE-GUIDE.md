@@ -180,7 +180,7 @@ universal-agentic-os/
 ├── CONTRIBUTING.md, CHANGELOG.md
 ├── .gitignore, .gitattributes, .env.example
 ├── docs/                         <- the 7 guides (this file is 00)
-├── skills/                       <- the 6 core skills
+├── skills/                       <- the 6 operational core skills + the universal-agentic-workflow meta-skill
 ├── scripts/
 │   ├── setup-toolkit.sh          <- provisions CLAUDE_TOOLKIT_DIR
 │   └── sync-toolkit.sh           <- updates it
@@ -189,5 +189,5 @@ universal-agentic-os/
 
 - The repository evolves through the same four phases: Discover & Launch produced this layout; Architect & Guide specified the 7 guides; changes are implemented and verified in isolated worktrees; releases pass the guards and ship through the github-release-packager skill.
 - Role separation holds here too: routing and sequencing decisions live in the roadmap and backlog, specification and gate ownership sit with the reviewing side, and implementation lands as small diffs gated by `.github/workflows/ci.yml`.
-- The 6 core skills — `agentic-project-launcher`, `claude-stage-orchestrator`, `session-context-primer`, `circuit-breaker-guard`, `preflight-system-doctor`, `github-release-packager` — are the executable form of the rules in this guide.
+- The 6 operational core skills — `agentic-project-launcher`, `claude-stage-orchestrator`, `session-context-primer`, `circuit-breaker-guard`, `preflight-system-doctor`, `github-release-packager` — are the executable form of the rules in this guide. The seventh skill, `universal-agentic-workflow`, is the Universal Meta-Skill: the agent-facing entry point that condenses this entire guide set into one operating manual so any AI agent reaches complete comprehension at session start.
 - Upstream toolkits stay centralized under `CLAUDE_TOOLKIT_DIR` (default `~/ai-agent-toolkit`) and are managed exclusively by `scripts/setup-toolkit.sh` and `scripts/sync-toolkit.sh`.

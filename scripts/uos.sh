@@ -40,7 +40,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$UOS_SOURCE")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHECKPOINT="${REPO_ROOT}/docs/10-CHECKPOINT.md"
-UOS_VERSION="1.1.0"
+UOS_VERSION="1.2.0"
 
 usage() {
     sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,20p'
@@ -149,6 +149,18 @@ cmd_doctor() {
             printf '  FAIL    claude hooks   .claude/settings.json missing a lifecycle\n'
             rc=1
         fi
+
+        # Every hook script the settings name must exist on disk.
+        while IFS= read -r hook_file; do
+            [ -n "$hook_file" ] || continue
+            if [ -f "${REPO_ROOT}/${hook_file}" ]; then
+                printf '  ok      %-14s %s\n' 'hook file' "$hook_file"
+            else
+                printf '  FAIL    %-14s missing: %s\n' 'hook file' "$hook_file"
+                rc=1
+            fi
+        done < <(jq -r '.. | objects | .command? // empty' \
+            "${REPO_ROOT}/.claude/settings.json" 2> /dev/null | awk '{print $2}')
     fi
 
     # API keys: presence only — values are never read or printed.
@@ -201,9 +213,15 @@ cmd_status() {
     kit='ok'
     bash "${SCRIPT_DIR}/setup-toolkit.sh" --verify > /dev/null 2>&1 || kit='unverified'
 
+    # Orca worktree pool: dispatched streams = worktrees beyond main.
+    streams=$(( $(git -C "$REPO_ROOT" worktree list --porcelain 2> /dev/null \
+        | grep -c '^worktree ' || true) - 1 ))
+    [ "$streams" -lt 0 ] && streams=0
+
     printf '+----------------------------------------------------------------+\n'
     printf '| PHASE     : %s/4 %s\n' "$phase" "$(phase_name "$phase")"
-    printf '| MILESTONE : %s [%s]  TESTS: %s | KIT: %s\n' "$milestone" "$status" "$test_state" "$kit"
+    printf '| MILESTONE : %s [%s]  TESTS: %s | KIT: %s | POOL: %s stream(s)\n' \
+        "$milestone" "$status" "$test_state" "$kit" "$streams"
     printf '+----------------------------------------------------------------+\n'
 }
 

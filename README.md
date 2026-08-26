@@ -7,8 +7,8 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![Skills](https://img.shields.io/badge/skills-6-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
 
@@ -88,7 +88,7 @@ claude
 
 Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 
-Starting a brand-new project? [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) is the standalone prompt for new projects — paste it into any fresh Claude Code session to run Discover & Launch with the same rigor, no local setup required.
+Starting from a repository already seeded with the OS scaffold? [docs/05-INITIAL-PROMPT.md](docs/05-INITIAL-PROMPT.md) is the turnkey master initial project prompt — paste it into any fresh agent session to verify the 6-toolkit centralized toolkit, ingest and validate the existing specs, wire the hooks and the `uos` CLI, generate the project-tailored `CLAUDE.md`, anchor the checkpoint, and begin Phase 2 TDD immediately.
 
 ## The `uos` CLI
 
@@ -106,10 +106,11 @@ One entry point over everything above. Install it with `bash scripts/uos.sh inst
 
 ## Bundled Skills
 
-Six core skills ship with the OS. They are the executable form of its rules.
+Seven core skills ship with the OS. They are the executable form of its rules — six operational skills plus the Universal Meta-Skill that gives any AI agent complete comprehension of all of them.
 
 | Skill | What it does | Lifecycle phase |
 | --- | --- | --- |
+| [`universal-agentic-workflow`](skills/universal-agentic-workflow.md) | The Universal Meta-Skill: complete operating manual for the OS — tripartite model, 4-phase lifecycle, 6-toolkit rotation, Orca worktrees, every invariant and safety gate | Load once at session start, every phase |
 | [`agentic-project-launcher`](skills/agentic-project-launcher.md) | Runs Socratic discovery, completes the deployment-path check, and materializes the canonical 16-file scaffold | 1. Discover & Launch |
 | [`claude-stage-orchestrator`](skills/claude-stage-orchestrator.md) | Injects exactly the skills, toolkit assets, and documents a phase needs — and prunes the rest — through Orca ADE | Phase transitions across all four phases |
 | [`session-context-primer`](skills/session-context-primer.md) | Rebuilds essential working context in roughly ten seconds at session start and emits a CONTEXT ANCHOR block | Session bootstrap, every phase |
@@ -128,7 +129,7 @@ Seven guides document the framework end to end:
 | [`docs/02-TOOLKIT-AND-ORCA-GUIDE.md`](docs/02-TOOLKIT-AND-ORCA-GUIDE.md) | The centralized toolkit under `CLAUDE_TOOLKIT_DIR`, the 6 upstream toolkits, and the Orca ADE runtime layer |
 | [`docs/03-ORCA-WORKTREES-AND-PARALLEL-AGENTS.md`](docs/03-ORCA-WORKTREES-AND-PARALLEL-AGENTS.md) | The git-worktree pool: isolation rules, one concern per worktree, and reviewed merges from parallel Implementers |
 | [`docs/04-QUALITY-GATES-AND-SAFETY.md`](docs/04-QUALITY-GATES-AND-SAFETY.md) | Quality gates and safety: the second-pass guards, circuit-breaker policy, secret handling, and the security baseline |
-| [`docs/05-INITIAL-PROMPT.md`](docs/05-INITIAL-PROMPT.md) | The standalone initial prompt for launching a new project with the OS |
+| [`docs/05-INITIAL-PROMPT.md`](docs/05-INITIAL-PROMPT.md) | The turnkey master initial project prompt: toolkit verification, spec ingestion, machinery wiring, tailored `CLAUDE.md` generation, checkpoint anchoring, and immediate Phase 2 TDD |
 | [`docs/06-ENGINEERING-PILLARS.md`](docs/06-ENGINEERING-PILLARS.md) | The 10 engineering pillars and how every role, phase, skill, and guard operationalizes them |
 | [`docs/10-CHECKPOINT.md`](docs/10-CHECKPOINT.md) | Live session state: `ACTIVE_PHASE`, `status`, and the milestone DAG; completed milestones archive to `docs/archive/` |
 
