@@ -57,7 +57,7 @@ extract_notes() {
 
 main() {
     local version="" draft=""
-    local notes branch tag
+    local notes branch tag repo_slug
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -135,8 +135,8 @@ main() {
         exit 1
     fi
 
-    log_info "released ${tag}: https://github.com/$(git -C "$REPO_ROOT" remote get-url origin \
-        | sed -E 's#.*github.com[/:]##; s#\.git$#')/releases/tag/${tag}"
+    repo_slug="$(git -C "$REPO_ROOT" remote get-url origin | sed -E 's#.*github\.com[/:]##; s#\.git$##')"
+    log_info "released ${tag}: https://github.com/${repo_slug}/releases/tag/${tag}"
     exit 0
 }
 
