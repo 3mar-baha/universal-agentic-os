@@ -38,9 +38,13 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 
 $RepoRoot = $PSScriptRoot
 if (-not $RepoRoot) { $RepoRoot = (Get-Location).Path }
+# Cross-platform homes: USERPROFILE exists on Windows, HOME on Linux/macOS;
+# GetTempPath() resolves the temp root everywhere.
+$HomeDir = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
+$TempRoot = [System.IO.Path]::GetTempPath()
 $EnvFile = Join-Path (Get-Location).Path '.env.vantrilex'
 $ToolkitDir = $env:CLAUDE_TOOLKIT_DIR
-if (-not $ToolkitDir) { $ToolkitDir = Join-Path $env:USERPROFILE 'ai-agent-toolkit' }
+if (-not $ToolkitDir) { $ToolkitDir = Join-Path $HomeDir 'ai-agent-toolkit' }
 
 $Script:ToolkitNames = @(
     'everything-claude-code',
@@ -403,7 +407,7 @@ function Invoke-SelfTest {
     Assert 'continue-project prompt covers checkpoint, BLOCKED path, and TDD resume' ($cont -match 'PRIME CONTEXT' -and $cont -match 'BLOCKED' -and $cont -match 'RESUME IMMEDIATELY')
 
     # Toolkit inventory function is exercisable offline.
-    $tc = Get-ToolkitCount -Dir (Join-Path $env:TEMP 'definitely-missing-dir')
+    $tc = Get-ToolkitCount -Dir (Join-Path $TempRoot 'definitely-missing-vantrilex-probe')
     Assert 'toolkit inventory returns 0 for empty dir' ($tc -eq 0)
 
     Write-Host ('[selftest] {0} assertion(s), {1} failure(s)' -f $script:total, $script:failures)

@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.5.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.5.3-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)

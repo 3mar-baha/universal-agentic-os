@@ -2,6 +2,12 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning, occasionally extended with a fourth numeric segment.
 
+## [1.4.5.3] - 2026-08-26
+
+### Fixed
+
+- Vantrilex crashed at load time on non-Windows platforms (`USERPROFILE` and `TEMP` are unset on Linux/macOS), which CI's self-test step caught on ubuntu: home resolution now falls back across `USERPROFILE`/`HOME`, and the temp root comes from the cross-platform `[System.IO.Path]::GetTempPath()`.
+
 ## [1.4.5.2] - 2026-08-26
 
 The maturity pass plus project continuation: launcher logic becomes testable, the agent CLIs are executed by CI, and Vantrilex can resume an in-flight project - not only start new ones.
