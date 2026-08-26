@@ -57,9 +57,25 @@ main() {
         "${REPO_ROOT}/.claude/agents" \
         "${REPO_ROOT}/.claude/hooks/ecc"; do
         if [ -d "$target" ]; then
-            rm -rf "$target"
-            removed=$((removed + 1))
-            log_info "removed $(basename "$target")/"
+            # MSYS/Windows quirk: freshly copied trees can lose their
+            # children yet resist the final rmdir for a moment. Verify the
+            # removal actually happened; retry, then fall back to the
+            # native Windows remover before admitting defeat. Never claim
+            # a success that did not happen.
+            rm -rf "$target" 2> /dev/null || true
+            if [ -d "$target" ]; then
+                sleep 1
+                rm -rf "$target" 2> /dev/null || true
+            fi
+            if [ -d "$target" ] && command -v cmd > /dev/null 2>&1 && command -v cygpath > /dev/null 2>&1; then
+                cmd //c "rmdir /s /q $(cygpath -w "$target")" > /dev/null 2>&1 || true
+            fi
+            if [ -d "$target" ]; then
+                log_warn "could not fully remove $(basename "$target")/; a process may still hold it"
+            else
+                removed=$((removed + 1))
+                log_info "removed $(basename "$target")/"
+            fi
         fi
     done
 

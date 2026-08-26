@@ -2,6 +2,20 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning, occasionally extended with a fourth numeric segment.
 
+## [1.4.6] - 2026-08-26
+
+The workflow proof suite: the entire lifecycle is now executed for real against throwaway projects, on every push and on demand.
+
+### Added
+
+- `tests/workflow-tests.sh` (52 assertions, wired into CI): end-to-end execution of the actual machinery — `uos new` scaffold/vendoring/first commit; `uos init` bootstrap with doctor; ingest/plan/graph auto-detection/decide on a fresh project; a genuine red→green TDD micro-cycle through the Makefile contract; the full circuit-breaker chain (3 strikes → DIR → BLOCKED → dispatch refused → Guide-approved resume); merge gates refusing a broken diff then integrating a clean one with checkpoint stamping and worktree pruning; session start/end lifecycle; live-fire pre-commit rejections (API key, bearer header, AI-attribution trailer) with a benign-commit control; release refusals (unknown version, dirty tree, existing tag); and real agent-CLI launches including Codex accepting the exact `-c` override syntax Vantrilex generates.
+
+### Fixed
+
+- `uos new` did not vendor `AGENTS.md` into scaffolded projects.
+- `teardown-stage.sh` reported removals without verifying them; MSYS/Windows can empty a tree yet briefly resist the final rmdir — teardown now verifies, retries, falls back to the native Windows remover, and only reports success that actually happened.
+- CI ECC fixture files were written via single-quoted `echo '\n'`, which does not expand escapes; written with `printf` now.
+
 ## [1.4.5.3] - 2026-08-26
 
 ### Fixed

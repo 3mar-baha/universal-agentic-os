@@ -324,6 +324,7 @@ vendor_runtime() {
     cp "${REPO_ROOT}/.mcp.json" "${dst}/.mcp.json"
     cp "${REPO_ROOT}/.editorconfig" "${dst}/.editorconfig" 2> /dev/null || true
     cp "${REPO_ROOT}/.markdownlint.jsonc" "${dst}/.markdownlint.jsonc" 2> /dev/null || true
+    cp "${REPO_ROOT}/AGENTS.md" "${dst}/AGENTS.md" 2> /dev/null || true
 }
 
 main() {

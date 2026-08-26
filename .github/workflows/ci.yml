@@ -280,6 +280,12 @@ jobs:
           npx --yes opencode-ai@latest --version
           npx --yes @openai/codex@latest --version
 
+      - name: Real workflow end-to-end suite
+        timeout-minutes: 15
+        env:
+          CLAUDE_TOOLKIT_DIR: ${{ runner.temp }}/fixture-toolkit
+        run: bash tests/workflow-tests.sh
+
   build:
     name: Build
     needs: [lint, test]
