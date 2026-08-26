@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -90,11 +90,26 @@ Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 
 ### Vantrilex launcher (Windows)
 
-[`vantrilex.ps1`](vantrilex.ps1) is the interactive Claude Code orchestrator: pick a provider (DeepSeek direct, OrcaRouter free gateway, Ox Alpha via OpenRouter with 1M context, or any custom OpenAI-compatible endpoint), an effort level up to Ultracode, and a project path — it sets the environment and launches. No keys are stored in the script: they come from your environment, a gitignored `.env.vantrilex` sidecar, or are asked for at launch with opt-in save.
+[`vantrilex.ps1`](vantrilex.ps1) is the interactive Claude Code orchestrator — a full session bootstrap, not just an environment setter:
+
+1. **Prompt type first**: no prompt; **I have full docs** (injects the Master Initial Project Prompt, extracted live from `docs/05-INITIAL-PROMPT.md` — ingests your documentation read-only and starts Phase 2 TDD); or **I have an idea** (grill-me style Socratic interview about your idea → authors the complete canonical documentation suite → follows the governed workflow).
+2. **Provider**: DeepSeek direct, OrcaRouter free gateway, Ox Alpha via OpenRouter (1M context), or any custom OpenAI-compatible endpoint.
+3. **Effort level** up to Ultracode, then the project path.
+4. **Session preparation**: provisions the 6 toolkits if missing, vendors the OS runtime into the project when absent (native hooks + settings, lifecycle scripts, the Universal Meta-Skill, pinned `.mcp.json`, lint config) so MCP servers, skills, and hooks load directly into the session.
+5. **Launches Claude Code** with the chosen prompt pre-loaded as the session's first message.
+
+No keys are stored in the script: environment → gitignored `.env.vantrilex` sidecar (opt-in save) → interactive paste, masked to the last 6 characters.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File vantrilex.ps1
 ```
+
+### Security & key rotation
+
+- This repository ships **zero secrets** — pre-commit scanning rejects known API-key formats, bearer headers, and credential-shaped assignments on every commit.
+- Launcher keys resolve from your process environment or a gitignored `.env.vantrilex`; never commit that file, never paste keys into issues or chats.
+- **Rotate immediately** any key that appeared in plaintext anywhere (chat, screenshot, repo history): DeepSeek → Platform dashboard → API keys → delete + create; OpenRouter → Settings → Keys → create new, revoke old; Orca → provider console. Update the value in your environment or `.env.vantrilex` afterwards — nothing else references it.
+- If a secret ever reaches git history, rotation is the fix; history rewriting does not un-leak it.
 
 Sessions run with a pinned MCP baseline — [`.mcp.json`](.mcp.json) enforces five core servers (`fetch`, `brave-search`, `sequential-thinking`, `filesystem`, `git`; credentials by environment variable name only) — and [.devcontainer/](.devcontainer/) gives one-command environment parity for local and cloud sandboxes, preloading all 6 toolkits via `postCreateCommand`.
 

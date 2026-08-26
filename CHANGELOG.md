@@ -2,6 +2,17 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
 
+## [1.4.3] - 2026-08-26
+
+Vantrilex becomes a full session bootstrap: prompt-type selection first, OS runtime carried into the session, and the chosen prompt pre-loaded as the first message.
+
+### Added
+
+- Prompt-type menu asked before everything else: no prompt; "I have full docs" (injects the Master Initial Project Prompt, extracted live from `docs/05-INITIAL-PROMPT.md` at launch so there is a single source of truth); or "I have an idea" (grill-me style Socratic interview of at least 8 questions with assumption-challenging, then authors the complete canonical documentation suite, anchors the checkpoint, and starts Phase 2 TDD under Guide gates).
+- Session preparation stage: provisions the 6 toolkits when missing (`setup-toolkit.sh`), and vendors the OS runtime into projects that lack it — native hooks + settings, lifecycle scripts, the Universal Meta-Skill, the pinned `.mcp.json`, lint config, and `AGENTS.md` — so MCP servers, skills, and hooks load directly into every session in that project.
+- Launch integration: the selected prompt is piped into Claude Code as the session's first message (temp file, UTF-8, deleted after launch); plain sessions launch unchanged.
+- README security section (English and Arabic): zero-secrets guarantees, key-handling rules, and per-provider rotation steps (rotation is the fix for leaked keys; history rewriting is not).
+
 ## [1.4.2] - 2026-08-26
 
 The Vantrilex launcher: one interactive entry point for running Claude Code across providers, with zero secrets committed.

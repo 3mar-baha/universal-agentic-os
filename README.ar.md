@@ -7,7 +7,7 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -89,11 +89,26 @@ uos new my-project ~/Projects
 
 ### مشغّل Vantrilex (ويندوز)
 
-[`vantrilex.ps1`](vantrilex.ps1) هو منسّق Claude Code التفاعلي: اختر المزوّد (DeepSeek مباشر، بوابة OrcaRouter المجانية، Ox Alpha عبر OpenRouter بسياق مليون توكن، أو أي endpoint متوافق تخصصه بنفسك)، ومستوى الجهد حتى Ultracode، ومسار المشروع — فيضبط البيئة ويطلق. لا مفاتيح مخزنة في السكربت: تأتي من بيئتك أو من ملف `.env.vantrilex` المستثنى من git، أو تُطلب عند الإطلاق مع حفظ اختياري.
+[`vantrilex.ps1`](vantrilex.ps1) هو منسّق Claude Code التفاعلي — تهيئة جلسة كاملة، لا مجرد ضبط بيئة:
+
+1. **نوع البروموت أولًا**: بدون بروموت؛ **لديّ توثيق كامل** (يحقن الموجّه الافتتاحي الشامل مستخرجًا مباشرة من `docs/05-INITIAL-PROMPT.md` — يبتلع توثيقك قراءةً فقط ويبدأ المرحلة 2 عبر TDD)؛ أو **لديّ فكرة** (مقابلة سقراطية على طريقة grill-me لفكرتك ← ثم كتابة جناح التوثيق القياسي كاملًا ← ثم العمل وفق سير العمل المحكوم).
+2. **المزوّد**: DeepSeek مباشر، بوابة OrcaRouter المجانية، Ox Alpha عبر OpenRouter (سياق مليون)، أو أي endpoint متوافق تخصصه.
+3. **مستوى الجهد** حتى Ultracode، ثم مسار المشروع.
+4. **تهيئة الجلسة**: يوفّر حزم الأدوات الست إن غابت، ويثبّت بيئة تشغيل النظام في المشروع إن لم تكن موجودة (خطّافات + settings، سكربتات دورة الحياة، الميتا-سكيل، `.mcp.json` مثبّت، إعدادات lint) — فيتحمل MCP والمهارات والخطّافات إلى الجلسة مباشرة.
+5. **يطلق Claude Code** والبروموت المختار محمَّلًا سلفًا كأول رسالة في الجلسة.
+
+لا مفاتيح مخزنة في السكربت: البيئة ← ملف `.env.vantrilex` المستثنى من git (حفظ اختياري) ← لصق تفاعلي مقنّع لآخر 6 أحرف.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File vantrilex.ps1
 ```
+
+### الأمان وتدوير المفاتيح
+
+- هذا المستودع يشحن **صفر أسرار** — الفحص قبل الالتزام يرفض صيغ مفاتيح API المعرومة ورؤوس Bearer والإسنادات الشبيهة بالاعتمادات في كل كوميت.
+- مفاتيح المشغّل تُحل من بيئتك أو `.env.vantrilex` المستثنى؛ لا تلتقط ذلك الملف أبدًا ولا تلصق مفاتيح في issues أو محادثات.
+- **دوّر فورًا** أي مفتاح ظهر نصًا صريحًا في أي مكان (محادثة، لقطة شاشة، تاريخ مستودع): DeepSeek ← لوحة المنصة ← API keys ← حذف وإنشاء؛ OpenRouter ← Settings ← Keys ← أنشئ جديدًا وأبطل القديم؛ Orca ← لوحة المزوّد. حدّث القيمة في بيئتك أو `.env.vantrilex` بعدها — لا شيء آخر يشير إليها.
+- إذا وصل سرٌّ إلى تاريخ git فالحل هو التدوير؛ إعادة كتابة التاريخ لا تسحب ما تسرب.
 
 تُشغَّل الجلسات على أساس بروتوكول MCP مثبّت — يفرض ملف [`.mcp.json`](.mcp.json) خمسة خوادم أساسية (`fetch` و`brave-search` و`sequential-thinking` و`filesystem` و`git`؛ والاعتمادات بأسماء متغيرات البيئة فقط) — ويمنح [.devcontainer/](.devcontainer/) تكافؤ بيئة بأمر واحد للصناديق المحلية والسحابية، محمّلًا سلفًا بحزم الأدوات الستّ عبر `postCreateCommand`.
 
