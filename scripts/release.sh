@@ -77,10 +77,10 @@ main() {
     done
 
     case "$version" in
-        [vV][0-9]*.[0-9]*.[0-9]*) version="${version#[vV]}" ;;
+        [vV][0-9]*) version="${version#[vV]}" ;;
     esac
-    if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-        log_error "VERSION must be X.Y.Z (got: '${version}')."
+    if ! printf '%s' "$version" | grep -qE '^[0-9]+(\.[0-9]+){2,3}$'; then
+        log_error "VERSION must be X.Y.Z or X.Y.Z.W (got: '${version}')."
         usage >&2
         exit 1
     fi

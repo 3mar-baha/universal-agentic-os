@@ -7,7 +7,7 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.4-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.5.2-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -91,7 +91,7 @@ uos new my-project ~/Projects
 
 [`vantrilex.ps1`](vantrilex.ps1) هو منسّق وكلاء البرمجة التفاعلي — مشغّل واحد لـ **Claude Code وOpenCode وCodex**، وتهيئة جلسة كاملة لا مجرد ضبط بيئة:
 
-1. **نوع البروموت أولًا**: بدون بروموت؛ **لديّ توثيق كامل** (يحقن الموجّه الافتتاحي الشامل مستخرجًا مباشرة من `docs/05-INITIAL-PROMPT.md` — يبتلع توثيقك قراءةً فقط ويبدأ المرحلة 2 عبر TDD)؛ أو **لديّ فكرة** (مقابلة سقراطية على طريقة grill-me ← ثم كتابة جناح التوثيق القياسي كاملًا ← ثم العمل وفق سير العمل المحكوم).
+1. **نوع البروموت أولًا**: بدون بروموت؛ **مشروع جديد بتوثيق كامل** (يحقن الموجّه الافتتاحي الشامل مستخرجًا مباشرة من `docs/05-INITIAL-PROMPT.md` — يبتلع توثيقك قراءةً فقط ويبدأ المرحلة 2 عبر TDD)؛ **مشروع جديد من فكرة** (مقابلة grill-me سقراطية ← ثم تأليف جناح التوثيق القياسي كاملًا ← ثم العمل وفق سير العمل المحكوم)؛ أو **متابعة مشروع قائم** (تهيئة السياق من الـcheckpoint، واحترام مسار BLOCKED لقاطع الدائرة، واستئناف أول معلمة مفتوحة بـ TDD صارم).
 2. **المزوّد**: DeepSeek مباشر، بوابة OrcaRouter المجانية، Ox Alpha عبر OpenRouter (سياق مليون)، أو أي endpoint مخصص.
 3. **الأداة**: Claude Code (ربط متغيرات Anthropic)، OpenCode (مفاتيح المزوّدين القياسية + `-m provider/model`)، أو Codex (`-c model_provider` فوق endpoint متوافق مع OpenAI). الترجمة بين المزوّد والأداة تلقائية؛ والتركيبات غير المدعومة تُنبَّه بدل أن تفشل بصمت.
 4. **مستوى الجهد** حتى Ultracode (يُطبَّق حيث تدعمه الأداة)، ثم مسار المشروع.
@@ -99,6 +99,14 @@ uos new my-project ~/Projects
 6. **يطلق الأداة المختارة** والبروموت المختار أول رسالة فيها.
 
 لا مفاتيح مخزنة في السكربت: البيئة ← ملف `.env.vantrilex` المستثنى من git (حفظ اختياري) ← لصق تفاعلي مقنّع لآخر 6 أحرف.
+
+**مُتحقق منه لا مُفترض**: منطق الترجمة بين المزوّد والأداة يعيش في دالة نقية واحدة تمارسها مصفوفة اختبار ذاتي دون اتصال تغطي كل تركيبة (أداة × مزوّد):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File vantrilex.ps1 -SelfTest
+```
+
+ويشغّل CI تلك المصفوفة عند كل دفع، إضافةً إلى اختبار إطلاق حقيقي ينفّذ `--version` لكل أداة فعليًا (`@anthropic-ai/claude-code` و`opencode-ai` و`@openai/codex`).
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File vantrilex.ps1

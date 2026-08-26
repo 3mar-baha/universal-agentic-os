@@ -58,7 +58,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$UOS_SOURCE")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHECKPOINT="${REPO_ROOT}/docs/10-CHECKPOINT.md"
-UOS_VERSION="1.4.4"
+UOS_VERSION="1.4.5.2"
 
 usage() {
     sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,35p'
@@ -275,12 +275,12 @@ cmd_ship() {
     fi
 
     # Release-consistency gate: CHANGELOG head, README badges, and the CLI
-    # must all declare the same version.
-    version="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' "${REPO_ROOT}/CHANGELOG.md" 2> /dev/null | tr -d '[]# ' | sed 's/^##//')"
+    # must all declare the same version (three or four dot-separated parts).
+    version="$(grep -m1 -oE '^## \[[0-9]+(\.[0-9]+){2,3}\]' "${REPO_ROOT}/CHANGELOG.md" 2> /dev/null | tr -d '[]# ' | sed 's/^##//')"
     version="${version:-unknown}"
     consistent=1
     for src in README.md README.ar.md; do
-        src_ver="$(grep -m1 -oE 'version-[0-9]+\.[0-9]+\.[0-9]+' "${REPO_ROOT}/${src}" 2> /dev/null | cut -d- -f2-)"
+        src_ver="$(grep -m1 -oE 'version-[0-9]+(\.[0-9]+){2,3}' "${REPO_ROOT}/${src}" 2> /dev/null | cut -d- -f2-)"
         if [ "$src_ver" != "$version" ]; then
             echo "[ship]   versions ......... FAIL (${src} badge '${src_ver:-absent}' != CHANGELOG ${version})"
             consistent=0

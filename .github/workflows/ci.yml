@@ -79,9 +79,9 @@ jobs:
           echo "fixture: test-guard"        > "$TK/guard-skills/skills/test-guard/SKILL.md"
           echo "fixture: docs-guard"        > "$TK/guard-skills/skills/docs-guard/SKILL.md"
           echo "fixture: security-review"   > "$TK/cybersecurity-skills/skills/implementing-github-advanced-security-for-code-scanning/SKILL.md"
-          echo '---\nfixture: ecc agent'    > "$TK/everything-claude-code/agents/tdd-guide.md"
-          echo '---\nfixture: ecc architect' > "$TK/everything-claude-code/agents/architect.md"
-          echo '---\nfixture: ecc security-reviewer' > "$TK/everything-claude-code/agents/security-reviewer.md"
+          printf -- '---\nfixture: ecc agent\n' > "$TK/everything-claude-code/agents/tdd-guide.md"
+          printf -- '---\nfixture: ecc architect\n' > "$TK/everything-claude-code/agents/architect.md"
+          printf -- '---\nfixture: ecc security-reviewer\n' > "$TK/everything-claude-code/agents/security-reviewer.md"
           echo "fixture: ecc testing rules" > "$TK/everything-claude-code/rules/testing.md"
           echo "fixture: ecc security rules" > "$TK/everything-claude-code/rules/security.md"
           # uos doctor verifies toolkit integrity via setup-toolkit.sh --verify,
@@ -269,6 +269,16 @@ jobs:
           git checkout -- docs/00-ARCHITECTURE-GUIDE.md 2> /dev/null || true
           rm -f docs/03-DECISIONS.md
           echo "graph sync + ADR ledger behave to contract"
+
+      - name: Vantrilex offline self-test matrix
+        run: pwsh -NoProfile -File ./vantrilex.ps1 -SelfTest
+
+      - name: Coding-agent CLIs launch smoke (--version)
+        timeout-minutes: 10
+        run: |
+          npx --yes @anthropic-ai/claude-code@latest --version
+          npx --yes opencode-ai@latest --version
+          npx --yes @openai/codex@latest --version
 
   build:
     name: Build

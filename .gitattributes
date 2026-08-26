@@ -11,5 +11,9 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 
+# PowerShell scripts stay CRLF in the working tree (Windows-first tooling);
+# the repository copy is normalized to LF like every other text file.
+*.ps1 text eol=crlf
+
 # Git hooks carry no extension; pin them so they run unchanged on Unix runners.
 .githooks/* text eol=lf

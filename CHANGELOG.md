@@ -1,6 +1,28 @@
 # Changelog
 
-All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
+All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning, occasionally extended with a fourth numeric segment.
+
+## [1.4.5.2] - 2026-08-26
+
+The maturity pass plus project continuation: launcher logic becomes testable, the agent CLIs are executed by CI, and Vantrilex can resume an in-flight project - not only start new ones.
+
+### Added
+
+- **Continue-a-project prompt type** in `vantrilex.ps1`: alongside "no prompt", "new project from full docs", and "new project from an idea", there is now "continue a project" - primes context (constitution, meta-skill, checkpoint, `uos ingest/status/doctor`), honors the BLOCKED circuit-breaker path, resumes the first open milestone with strict TDD through worktree dispatch/merge gates, and keeps archiving + changelog discipline as it goes.
+- `vantrilex.ps1 -SelfTest`: an offline assertion matrix (no keys, no network) that exercises the provider→tool translation for every agent × provider combination — env wiring, model pins (`-m`), Codex `-c` overrides over OpenAI-compatible endpoints, warning paths for unsupported combos — plus all three prompt builders and the toolkit-inventory helper. Exit code reports failures.
+- `Get-AgentPlan`: the per-tool wiring extracted into one pure function; the interactive flow consumes it, so what CI tests is exactly what launches.
+- CI Test job: runs the Vantrilex self-test matrix, then a real launch smoke executing each coding-agent CLI's `--version` (`@anthropic-ai/claude-code`, `opencode-ai`, `@openai/codex`) to prove the pinned packages resolve and run.
+- `.gitattributes`: PowerShell sources pinned to CRLF working-tree / LF repository, ending checkout churn warnings.
+
+### Fixed
+
+- CI fixture files for ECC agents were written via single-quoted `echo '\n'`, which does not expand escapes — the fixtures contained a literal `\n` on one line instead of a real frontmatter break; they are written with `printf` now.
+
+### Changed
+
+- Toolkit provisioning now reports an exact inventory (`n/6`) instead of a single-marker existence check.
+- Installing the OS runtime into the OS repository itself is detected and reported as already-present instead of re-copying.
+- Version gates accept three or four dot-separated numeric segments (`X.Y.Z.W`).
 
 ## [1.4.4] - 2026-08-26
 

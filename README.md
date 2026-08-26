@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.4-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.5.2-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -92,7 +92,7 @@ Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 
 [`vantrilex.ps1`](vantrilex.ps1) is the interactive coding-agent orchestrator — one launcher for **Claude Code, OpenCode, and Codex**, and a full session bootstrap, not just an environment setter:
 
-1. **Prompt type first**: no prompt; **I have full docs** (injects the Master Initial Project Prompt, extracted live from `docs/05-INITIAL-PROMPT.md` — ingests your documentation read-only and starts Phase 2 TDD); or **I have an idea** (grill-me style Socratic interview about your idea → authors the complete canonical documentation suite → follows the governed workflow).
+1. **Prompt type first**: no prompt; **new project from full docs** (injects the Master Initial Project Prompt, extracted live from `docs/05-INITIAL-PROMPT.md` — ingests your documentation read-only and starts Phase 2 TDD); **new project from an idea** (grill-me style Socratic interview → authors the complete canonical documentation suite → follows the governed workflow); or **continue a project** (primes context from the checkpoint, honors the BLOCKED circuit-breaker path, resumes the first open milestone with strict TDD).
 2. **Provider**: DeepSeek direct, OrcaRouter free gateway, Ox Alpha via OpenRouter (1M context), or any custom endpoint.
 3. **Agent**: Claude Code (Anthropic env wiring), OpenCode (standard provider keys + `-m provider/model`), or Codex (`-c model_provider` overrides over an OpenAI-compatible endpoint). Provider→tool translation is automatic; unsupported combinations warn instead of failing silently.
 4. **Effort level** up to Ultracode (applied where the agent supports it), then the project path.
@@ -100,6 +100,14 @@ Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 6. **Launches the chosen agent** with the chosen prompt as its first message.
 
 No keys are stored in the script: environment → gitignored `.env.vantrilex` sidecar (opt-in save) → interactive paste, masked to the last 6 characters.
+
+**Verified, not assumed.** The provider→tool translation lives in one pure function exercised by an offline self-test matrix covering every agent × provider combination:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File vantrilex.ps1 -SelfTest
+```
+
+CI additionally runs that matrix on every push plus a launch smoke that executes each agent CLI's `--version` for real (`@anthropic-ai/claude-code`, `opencode-ai`, `@openai/codex`).
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File vantrilex.ps1
