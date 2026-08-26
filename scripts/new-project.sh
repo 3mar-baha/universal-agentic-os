@@ -360,7 +360,13 @@ main() {
     log_info 'initializing git...'
     git -C "$target" init -q -b main
     git -C "$target" add -A
-    if ! git -C "$target" commit -qm "chore: scaffold ${name} under universal agentic engineering os"; then
+    # Fresh machines and CI runners may carry no git identity; supply a
+    # local-only one for the scaffold commit when none is configured.
+    ident_args=()
+    if [ -z "$(git -C "$target" config user.email 2> /dev/null || true)" ]; then
+        ident_args=(-c user.name="Universal Agentic OS" -c user.email="uos@scaffold.local")
+    fi
+    if ! git -C "$target" commit "${ident_args[@]}" -qm "chore: scaffold ${name} under universal agentic engineering os"; then
         log_error 'initial commit failed (is git user.name/user.email configured globally?).'
         log_error "the scaffold remains intact at ${target}; configure identity and commit manually."
         exit 1

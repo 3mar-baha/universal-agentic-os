@@ -52,6 +52,12 @@ else
     bad "new-project.sh exited non-zero"
 fi
 D="${TMP}/demo"
+# CI runners ship without a global git identity; every commit context below
+# needs one. Only fill it when absent so a real user's identity is untouched.
+if [ -z "$(git config --global user.email 2> /dev/null || true)" ]; then
+    git config --global user.email "workflow-tests@example.invalid"
+    git config --global user.name "Workflow Tests"
+fi
 for f in CLAUDE.md README.md .gitignore .env.example LICENSE CONTRIBUTING.md \
          CHANGELOG.md SECURITY.md Makefile .github/workflows/ci.yml \
          docs/00-VISION.md docs/01-ARCHITECTURE.md docs/02-BACKLOG.md \

@@ -2,6 +2,13 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning, occasionally extended with a fourth numeric segment.
 
+## [1.4.6.1] - 2026-08-26
+
+### Fixed
+
+- `uos new` failed its initial commit on machines without a git identity (fresh CI runners): the scaffold commit now supplies a local-only identity when none is configured.
+- The workflow suite only fills a missing global git identity instead of overwriting an existing one.
+
 ## [1.4.6] - 2026-08-26
 
 The workflow proof suite: the entire lifecycle is now executed for real against throwaway projects, on every push and on demand.

@@ -58,7 +58,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$UOS_SOURCE")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHECKPOINT="${REPO_ROOT}/docs/10-CHECKPOINT.md"
-UOS_VERSION="1.4.6"
+UOS_VERSION="1.4.6.1"
 
 usage() {
     sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,35p'
