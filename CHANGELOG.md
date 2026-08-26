@@ -2,6 +2,19 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
 
+## [1.4.4] - 2026-08-26
+
+Vantrilex goes multi-agent: the same prompt-type → provider → session-preparation flow now launches Claude Code, OpenCode, or Codex.
+
+### Added
+
+- Agent selection stage in `vantrilex.ps1`: Claude Code (`npx @anthropic-ai/claude-code`), OpenCode (`npx opencode-ai`), Codex (`npx @openai/codex`) — with automatic per-tool translation of the chosen provider:
+  - Claude Code keeps Anthropic-wire env wiring (`ANTHROPIC_BASE_URL`/`AUTH_TOKEN`/`MODEL`, subagent model, 1M-context flags for Ox Alpha).
+  - OpenCode receives standard provider environment variables plus `-m provider/model` pinning (`deepseek/deepseek-chat`, `openrouter/stealth/ox-alpha`); unmapped providers launch with a pick-inside-TUI hint instead of failing silently.
+  - Codex receives `-c model_provider` overrides defining a `vantrilex` provider over the provider's OpenAI-compatible endpoint (`wire_api=chat`, key via `VANTRILEX_API_KEY` env indirection); providers without a verified OpenAI-compatible base URL warn first.
+- The selected prompt (none / master initial project prompt / grill-me custom idea) passes to every agent as its first message; effort-level selection records a Claude Code-specific note when another agent is chosen.
+- READMEs document the multi-agent flow and its per-tool caveats.
+
 ## [1.4.3] - 2026-08-26
 
 Vantrilex becomes a full session bootstrap: prompt-type selection first, OS runtime carried into the session, and the chosen prompt pre-loaded as the first message.

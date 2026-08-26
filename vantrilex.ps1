@@ -1,27 +1,28 @@
 # ======================================================================
-# Vantrilex - Claude Code Orchestrator (Multi-Provider Session Launcher)
+# Vantrilex - AI Coding Orchestrator (Multi-Agent, Multi-Provider)
 # ======================================================================
-# One interactive entry point that:
-#   1. Asks what kind of prompt you want BEFORE anything else:
-#        [1] No prompt      - just open Claude Code
+# One interactive entry point that bootstraps a session for Claude Code,
+# OpenCode, or Codex against the provider you choose:
+#
+#   1. Prompt type FIRST:
+#        [1] No prompt      - just open the tool
 #        [2] Have full docs - inject the Master Initial Project Prompt
-#                             (ingests and validates your documentation,
-#                             zero overwriting, starts Phase 2 TDD)
-#        [3] Custom idea    - grill-me style Socratic interview about your
-#                             idea, then author the COMPLETE documentation
-#                             suite, then follow the governed workflow
-#   2. Selects the provider (keys resolved env -> .env.vantrilex -> paste;
-#      never stored in this file) and the effort level.
-#   3. Prepares the target project: provisions the 6 toolkits if missing,
-#      vendors the OS runtime (hooks, scripts, meta-skill, .mcp.json) when
-#      absent so MCP, skills, and hooks load directly into the session.
-#   4. Launches Claude Code with the chosen prompt pre-loaded as the first
-#      message of the session.
+#        [3] Custom idea    - grill-me interview -> complete documentation
+#                             suite -> governed workflow
+#   2. Provider (keys resolved env -> .env.vantrilex -> paste; never stored
+#      in this file, always masked to the last 6 characters).
+#   3. Agent: Claude Code | OpenCode | Codex - provider wiring translated
+#      per tool (Anthropic env vars / standard provider keys + -m model /
+#      -c model_provider overrides over OpenAI-compatible endpoints).
+#   4. Session preparation: provisions the 6 toolkits when missing and
+#      vendors the OS runtime (hooks, scripts, meta-skill, .mcp.json) into
+#      projects that lack it.
+#   5. Launches the chosen agent with the chosen prompt as first message.
 #
 # Run:  powershell -ExecutionPolicy Bypass -File vantrilex.ps1
 # ======================================================================
 
-$host.UI.RawUI.WindowTitle = 'Vantrilex - Claude Code Orchestrator'
+$host.UI.RawUI.WindowTitle = 'Vantrilex - AI Coding Orchestrator'
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -48,10 +49,10 @@ function Show-Logo {
     Write-Host ''
     Write-Host '              ───  ' -NoNewline -ForegroundColor Yellow
     Write-Host 'Vantrilex' -NoNewline -ForegroundColor Blue
-    Write-Host '  ───  Claude Code Orchestrator' -ForegroundColor Yellow
+    Write-Host '  ───  AI Coding Orchestrator' -ForegroundColor Yellow
     Write-Host '======================================================================' -ForegroundColor White
     Write-Host ''
-    Write-Host '🔑  Multi-Provider Gateway (DeepSeek / OpenRouter / Orca / Custom)' -ForegroundColor Green
+    Write-Host '🔑  Claude Code · OpenCode · Codex  ×  DeepSeek · OpenRouter · Orca · Custom' -ForegroundColor Green
     Write-Host ''
 }
 
@@ -74,7 +75,6 @@ function Save-SavedValue {
 
 function Get-Credential-Value {
     # Resolution order: process env -> .env.vantrilex -> paste (opt-in save).
-    # Only the last 6 characters of any key are ever displayed.
     param([string]$Name, [string]$Label)
 
     $val = [Environment]::GetEnvironmentVariable($Name, 'Process')
@@ -106,6 +106,11 @@ function Option-Line {
     Write-Host (" [{0}] " -f $Key) -NoNewline -ForegroundColor Cyan
     Write-Host $Text -NoNewline -ForegroundColor White
     if ($Hint) { Write-Host ('  ' + $Hint) -ForegroundColor Gray } else { Write-Host '' }
+}
+
+function Warn-Combo {
+    param([string]$Message)
+    Write-Host ('⚠  ' + $Message) -ForegroundColor Yellow
 }
 
 # ======================================================================
@@ -151,11 +156,10 @@ Hold all nine invariants throughout; tests are the contract; zero AI attribution
 }
 
 # ======================================================================
-# Session preparation
+# Session preparation helpers
 # ======================================================================
 
 function Ensure-Toolkits {
-    # Provision the 6 upstream toolkits once so skills resolve in-session.
     $marker = Join-Path $ToolkitDir 'everything-claude-code'
     if (Test-Path $marker) {
         Write-Host '✓  toolkits present' -ForegroundColor Green
@@ -173,10 +177,6 @@ function Ensure-Toolkits {
 }
 
 function Install-OsRuntime {
-    # Vendor the OS runtime into a project that lacks it: native hooks +
-    # settings (session lifecycle), lifecycle scripts, the Universal
-    # Meta-Skill, the pinned .mcp.json, and lint config. MCP servers,
-    # skills, and hooks then load directly into every session there.
     param([string]$ProjectPath)
 
     if (Test-Path (Join-Path $ProjectPath '.claude/hooks/session_start.sh')) {
@@ -214,7 +214,7 @@ Show-Logo
 
 do {
     Show-Menu 'What kind of prompt should this session start with?' 'Magenta'
-    Option-Line '1' 'No prompt'            '- just open Claude Code'
+    Option-Line '1' 'No prompt'            '- just open the coding agent'
     Option-Line '2' 'I have full docs'     '- inject the Master Initial Project Prompt (ingests your documentation, starts Phase 2 TDD)'
     Option-Line '3' 'I have an idea'       '- grill-me interview, then complete documentation, then the governed workflow'
     Option-Line 'X' 'Exit'
@@ -233,19 +233,19 @@ switch ($promptChoice) {
 }
 
 # ======================================================================
-# 2. Provider selection
+# 2. Provider selection (captures credentials + both wire endpoints)
 # ======================================================================
 
 Clear-Host
 Show-Logo
 
 do {
-    Show-Menu 'Select the provider to run Claude Code with' 'Yellow'
+    Show-Menu 'Select the provider' 'Yellow'
     Option-Line '1' 'DeepSeek V4 Pro'       '(Direct API - High Reliability)'
     Option-Line '2' 'DeepSeek V4 Flash'     '(Direct API - Fastest)'
     Option-Line '3' 'OrcaRouter (Free)'     '(Gateway, 90+ free providers)'
     Option-Line '4' 'Ox Alpha (OpenRouter)' '(1M Context)'
-    Option-Line 'C' 'Custom endpoint'       '(any OpenAI-compatible base URL + model)'
+    Option-Line 'C' 'Custom endpoint'       '(OpenAI-compatible base URL + model)'
     Option-Line 'X' 'Exit'
     Write-Host ''
     $choice = Read-Host '➤  Enter your choice (1/2/3/4/C/X)'
@@ -255,64 +255,122 @@ do {
     Write-Host ''
 } while ($true)
 
-$model = ''; $label = ''
+# Per-provider facts consumed by every agent adapter below.
+$ProviderName = ''; $ModelId = ''
+$AnthropicBase = $null   # anthropic-wire endpoint (Claude Code)
+$OpenAIBase = $null      # openai-wire endpoint (Codex); $null = unsupported
+$StandardEnvVar = $null  # env var third-party tools already recognize
+$Key = $null
 
 switch ($choice.ToLower()) {
     '1' {
-        $key = Get-Credential-Value 'DEEPSEEK_API_KEY' 'paste your DeepSeek key'
-        if (-not $key) { Write-Host 'No key provided.' -ForegroundColor Red; exit }
-        $model = 'DeepSeek V4 Pro'; $label = 'deepseek-chat'
-        $env:ANTHROPIC_BASE_URL = 'https://api.deepseek.com/anthropic'
-        $env:ANTHROPIC_AUTH_TOKEN = $key
-        $env:ANTHROPIC_MODEL = $label
-        $env:CLAUDE_CODE_SUBAGENT_MODEL = $label
+        $ProviderName = 'DeepSeek V4 Pro'; $ModelId = 'deepseek-chat'
+        $AnthropicBase = 'https://api.deepseek.com/anthropic'
+        $OpenAIBase = 'https://api.deepseek.com/v1'
+        $StandardEnvVar = 'DEEPSEEK_API_KEY'
+        $Key = Get-Credential-Value 'DEEPSEEK_API_KEY' 'paste your DeepSeek key'
     }
     '2' {
-        $key = Get-Credential-Value 'DEEPSEEK_API_KEY' 'paste your DeepSeek key'
-        if (-not $key) { Write-Host 'No key provided.' -ForegroundColor Red; exit }
-        $model = 'DeepSeek V4 Flash'; $label = 'deepseek-chat'
-        $env:ANTHROPIC_BASE_URL = 'https://api.deepseek.com/anthropic'
-        $env:ANTHROPIC_AUTH_TOKEN = $key
-        $env:ANTHROPIC_MODEL = $label
-        $env:CLAUDE_CODE_SUBAGENT_MODEL = $label
+        $ProviderName = 'DeepSeek V4 Flash'; $ModelId = 'deepseek-chat'
+        $AnthropicBase = 'https://api.deepseek.com/anthropic'
+        $OpenAIBase = 'https://api.deepseek.com/v1'
+        $StandardEnvVar = 'DEEPSEEK_API_KEY'
+        $Key = Get-Credential-Value 'DEEPSEEK_API_KEY' 'paste your DeepSeek key'
     }
     '3' {
-        $key = Get-Credential-Value 'ORCA_API_KEY' 'paste your Orca gateway key'
-        if (-not $key) { Write-Host 'No key provided.' -ForegroundColor Red; exit }
-        $model = 'OrcaRouter (Free Gateway)'; $label = 'deepseek/deepseek-chat'
-        $env:ANTHROPIC_BASE_URL = 'https://api.orcarouter.ai'
-        $env:ANTHROPIC_AUTH_TOKEN = $key
-        $env:ANTHROPIC_MODEL = $label
-        $env:CLAUDE_CODE_SUBAGENT_MODEL = $label
+        $ProviderName = 'OrcaRouter (Free Gateway)'; $ModelId = 'deepseek/deepseek-chat'
+        $AnthropicBase = 'https://api.orcarouter.ai'
+        $OpenAIBase = $null   # gateway wire compatibility varies; manual setup
+        $StandardEnvVar = $null
+        $Key = Get-Credential-Value 'ORCA_API_KEY' 'paste your Orca gateway key'
     }
     '4' {
-        $key = Get-Credential-Value 'OPENROUTER_API_KEY' 'paste your OpenRouter key (sk-or-v1-...)'
-        if (-not $key) { Write-Host 'No key provided.' -ForegroundColor Red; exit }
-        $model = 'Ox Alpha'; $label = 'stealth/ox-alpha'
-        $env:ANTHROPIC_BASE_URL = 'https://openrouter.ai/api'
-        $env:ANTHROPIC_AUTH_TOKEN = $key
-        $env:ANTHROPIC_MODEL = $label
-        $env:ANTHROPIC_SMALL_FAST_MODEL = $label
-        $env:CLAUDE_CODE_SUBAGENT_MODEL = $label
-        $env:CLAUDE_CODE_MAX_CONTEXT_TOKENS = '1000000'
-        $env:CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT = '1'
+        $ProviderName = 'Ox Alpha (OpenRouter)'; $ModelId = 'stealth/ox-alpha'
+        $AnthropicBase = 'https://openrouter.ai/api'
+        $OpenAIBase = 'https://openrouter.ai/api/v1'
+        $StandardEnvVar = 'OPENROUTER_API_KEY'
+        $Key = Get-Credential-Value 'OPENROUTER_API_KEY' 'paste your OpenRouter key (sk-or-v1-...)'
     }
     'c' {
-        $model = 'Custom endpoint'
-        $env:ANTHROPIC_BASE_URL = (Read-Host '➤  Base URL (e.g. https://host/api)')
-        if (-not $env:ANTHROPIC_BASE_URL) { Write-Host 'Base URL required.' -ForegroundColor Red; exit }
-        $label = Read-Host '➤  Model id (e.g. vendor/model-name)'
-        if (-not $label) { Write-Host 'Model id required.' -ForegroundColor Red; exit }
-        $key = Get-Credential-Value 'CUSTOM_API_KEY' 'paste the endpoint API key'
-        if (-not $key) { Write-Host 'No key provided.' -ForegroundColor Red; exit }
-        $env:ANTHROPIC_AUTH_TOKEN = $key
-        $env:ANTHROPIC_MODEL = $label
-        $env:CLAUDE_CODE_SUBAGENT_MODEL = $label
+        $ProviderName = 'Custom endpoint'
+        $url = Read-Host '➤  Base URL (OpenAI-compatible, incl. /v1)'
+        if (-not $url) { Write-Host 'Base URL required.' -ForegroundColor Red; exit }
+        $ModelId = Read-Host '➤  Model id (e.g. vendor/model-name)'
+        if (-not $ModelId) { Write-Host 'Model id required.' -ForegroundColor Red; exit }
+        $AnthropicBase = $url   # claude-code expects the anthropic-wire URL; enter it accordingly
+        $OpenAIBase = $url
+        $StandardEnvVar = $null
+        $Key = Get-Credential-Value 'CUSTOM_API_KEY' 'paste the endpoint API key'
+    }
+}
+if (-not $Key) { Write-Host 'No key provided.' -ForegroundColor Red; exit }
+
+# ======================================================================
+# 3. Agent selection + per-tool wiring
+# ======================================================================
+
+Clear-Host
+Show-Logo
+
+do {
+    Show-Menu 'Select the coding agent to launch' 'Cyan'
+    Option-Line '1' 'Claude Code'  '(npx @anthropic-ai/claude-code)'
+    Option-Line '2' 'OpenCode'     '(npx opencode-ai)'
+    Option-Line '3' 'Codex'        '(npx @openai/codex)'
+    Option-Line 'B' 'Back'         '- return to provider menu'
+    Option-Line 'X' 'Exit'
+    Write-Host ''
+    $agentChoice = Read-Host '➤  Enter your choice (1/2/3/B/X)'
+    if ($agentChoice -eq 'X' -or $agentChoice -eq 'x') { Write-Host 'Goodbye!' -ForegroundColor Green; exit }
+    if ($agentChoice -eq 'B' -or $agentChoice -eq 'b') { & $MyInvocation.MyCommand.Path; exit }
+    if ($agentChoice -in '1','2','3') { break }
+    Write-Host 'Invalid choice, please try again.' -ForegroundColor Red
+} while ($true)
+
+$AgentName = ''
+$LaunchArgs = @()   # extra CLI arguments before the prompt
+switch ($agentChoice) {
+    '1' {
+        $AgentName = 'Claude Code'
+        $env:ANTHROPIC_BASE_URL = $AnthropicBase
+        $env:ANTHROPIC_AUTH_TOKEN = $Key
+        $env:ANTHROPIC_MODEL = $ModelId
+        $env:CLAUDE_CODE_SUBAGENT_MODEL = $ModelId
+        if ($ProviderName -like 'Ox Alpha*') {
+            $env:ANTHROPIC_SMALL_FAST_MODEL = $ModelId
+            $env:CLAUDE_CODE_MAX_CONTEXT_TOKENS = '1000000'
+            $env:CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT = '1'
+        }
+    }
+    '2' {
+        $AgentName = 'OpenCode'
+        # OpenCode discovers providers from standard env vars; pin the model
+        # when the provider maps onto a known provider id.
+        if ($StandardEnvVar) { Set-Item -Path ("env:$StandardEnvVar") -Value $Key }
+        if ($ProviderName -like 'DeepSeek*')      { $LaunchArgs = @('-m', 'deepseek/deepseek-chat') }
+        elseif ($ProviderName -like 'Ox Alpha*')  { $LaunchArgs = @('-m', 'openrouter/stealth/ox-alpha') }
+        else { Warn-Combo 'OpenCode has no built-in provider for this endpoint; pick the model inside the TUI (/models) or add a custom provider to opencode.json.' }
+    }
+    '3' {
+        $AgentName = 'Codex'
+        # Codex speaks the OpenAI wire; translate via -c provider overrides.
+        if (-not $OpenAIBase) {
+            Warn-Combo 'this provider has no verified OpenAI-compatible endpoint; Codex launch may fail.'
+        }
+        $env:VANTRILEX_API_KEY = $Key
+        $LaunchArgs = @(
+            '-c', 'model_providers.vantrilex.name=Vantrilex',
+            '-c', ('model_providers.vantrilex.base_url=' + $OpenAIBase),
+            '-c', 'model_providers.vantrilex.env_key=VANTRILEX_API_KEY',
+            '-c', 'model_providers.vantrilex.wire_api=chat',
+            '-c', 'model_provider=vantrilex',
+            '-c', ('model=' + $ModelId)
+        )
     }
 }
 
 # ======================================================================
-# 3. Effort level
+# 4. Effort level (applies to Claude Code; recorded for the rest)
 # ======================================================================
 
 Clear-Host
@@ -326,23 +384,22 @@ do {
     Option-Line '4' 'XHigh'     '- Extra deep reasoning'
     Option-Line '5' 'Max'       '- Maximum reasoning quality'
     Option-Line '6' 'Ultracode' '- Multi-agent dynamic workflow orchestration'
-    Option-Line 'B' 'Back'      '- Return to provider menu'
+    Option-Line 'B' 'Back'      '- Return to agent menu'
     Write-Host ''
     $effort = Read-Host '➤  Enter the level number (1-6/B)'
-    if ($effort -eq 'B' -or $effort -eq 'b') {
-        & $MyInvocation.MyCommand.Path
-        exit
-    }
+    if ($effort -eq 'B' -or $effort -eq 'b') { & $MyInvocation.MyCommand.Path; exit }
     if ($effort -match '^[1-6]$') {
         $effortMap = @{ '1'='low'; '2'='medium'; '3'='high'; '4'='xhigh'; '5'='max'; '6'='ultracode' }
-        $env:CLAUDE_CODE_EFFORT_LEVEL = $effortMap[$effort]
+        $EffortLevel = $effortMap[$effort]
+        if ($AgentName -eq 'Claude Code') { $env:CLAUDE_CODE_EFFORT_LEVEL = $EffortLevel }
         break
     }
     Write-Host 'Invalid choice, please try again.' -ForegroundColor Red
 } while ($true)
+if ($AgentName -ne 'Claude Code' -and $EffortLevel) { $EffortLevel = "$EffortLevel (recorded; effort env is Claude Code-specific)" }
 
 # ======================================================================
-# 4. Project path + session preparation
+# 5. Project path + session preparation
 # ======================================================================
 
 Clear-Host
@@ -382,7 +439,7 @@ if ($promptChoice -eq '2') {
 }
 
 # ======================================================================
-# 5. Summary and launch (prompt pre-loaded as the first session message)
+# 6. Summary and launch (prompt passed as the session's first message)
 # ======================================================================
 
 Clear-Host
@@ -392,27 +449,25 @@ Write-Host '══════════════════════�
 Write-Host '                      🚀  Ready to Launch  🚀' -ForegroundColor White
 Write-Host '═══════════════════════════════════════════════════════════════' -ForegroundColor Cyan
 Write-Host ''
+Write-Host 'Agent'         -NoNewline -ForegroundColor White; Write-Host '         : ' -NoNewline; Write-Host $AgentName -ForegroundColor Cyan
 Write-Host 'Prompt type'   -NoNewline -ForegroundColor White; Write-Host '   : ' -NoNewline; Write-Host $promptLabel -ForegroundColor Magenta
-Write-Host 'Model'        -NoNewline -ForegroundColor White; Write-Host '        : ' -NoNewline; Write-Host $model -ForegroundColor Cyan
-Write-Host 'Effort Level' -NoNewline -ForegroundColor White; Write-Host ' : ' -NoNewline; Write-Host $env:CLAUDE_CODE_EFFORT_LEVEL -ForegroundColor Yellow
-Write-Host 'Path'         -NoNewline -ForegroundColor White; Write-Host '         : ' -NoNewline; Write-Host $projectPath -ForegroundColor White
+Write-Host 'Provider'      -NoNewline -ForegroundColor White; Write-Host '      : ' -NoNewline; Write-Host $ProviderName -ForegroundColor Cyan
+Write-Host 'Effort Level'  -NoNewline -ForegroundColor White; Write-Host ' : ' -NoNewline; Write-Host $EffortLevel -ForegroundColor Yellow
+Write-Host 'Path'          -NoNewline -ForegroundColor White; Write-Host '         : ' -NoNewline; Write-Host $projectPath -ForegroundColor White
 Write-Host ''
-Write-Host 'Press Enter to launch Claude Code...' -ForegroundColor Green
+Write-Host 'Press Enter to launch...' -ForegroundColor Green
 Read-Host | Out-Null
 
 Set-Location $projectPath
-Write-Host 'Launching Claude Code with ' -NoNewline; Write-Host $model -NoNewline -ForegroundColor Cyan
-Write-Host (' | prompt: ' + $promptLabel) -ForegroundColor Magenta
+Write-Host 'Launching ' -NoNewline; Write-Host $AgentName -NoNewline -ForegroundColor Cyan
+Write-Host (' | ' + $ProviderName + ' | prompt: ' + $promptLabel) -ForegroundColor Magenta
 Write-Host ''
 
-if ($promptText) {
-    $tmp = Join-Path $env:TEMP ('vantrilex-prompt-' + [guid]::NewGuid().ToString('N') + '.txt')
-    [System.IO.File]::WriteAllText($tmp, $promptText + [Environment]::NewLine, [System.Text.Encoding]::UTF8)
-    try {
-        Get-Content -Raw -Encoding UTF8 $tmp | npx @anthropic-ai/claude-code@latest
-    } finally {
-        Remove-Item $tmp -Force -ErrorAction SilentlyContinue
-    }
-} else {
-    npx @anthropic-ai/claude-code@latest
+$AllArgs = @($LaunchArgs)
+if ($promptText) { $AllArgs += $promptText }
+
+switch ($agentChoice) {
+    '1' { & npx '@anthropic-ai/claude-code@latest' @AllArgs }
+    '2' { & npx 'opencode-ai@latest' @AllArgs }
+    '3' { & npx '@openai/codex@latest' @AllArgs }
 }

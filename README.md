@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.4-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -90,13 +90,14 @@ Keep the toolkit current with `bash scripts/sync-toolkit.sh`.
 
 ### Vantrilex launcher (Windows)
 
-[`vantrilex.ps1`](vantrilex.ps1) is the interactive Claude Code orchestrator — a full session bootstrap, not just an environment setter:
+[`vantrilex.ps1`](vantrilex.ps1) is the interactive coding-agent orchestrator — one launcher for **Claude Code, OpenCode, and Codex**, and a full session bootstrap, not just an environment setter:
 
 1. **Prompt type first**: no prompt; **I have full docs** (injects the Master Initial Project Prompt, extracted live from `docs/05-INITIAL-PROMPT.md` — ingests your documentation read-only and starts Phase 2 TDD); or **I have an idea** (grill-me style Socratic interview about your idea → authors the complete canonical documentation suite → follows the governed workflow).
-2. **Provider**: DeepSeek direct, OrcaRouter free gateway, Ox Alpha via OpenRouter (1M context), or any custom OpenAI-compatible endpoint.
-3. **Effort level** up to Ultracode, then the project path.
-4. **Session preparation**: provisions the 6 toolkits if missing, vendors the OS runtime into the project when absent (native hooks + settings, lifecycle scripts, the Universal Meta-Skill, pinned `.mcp.json`, lint config) so MCP servers, skills, and hooks load directly into the session.
-5. **Launches Claude Code** with the chosen prompt pre-loaded as the session's first message.
+2. **Provider**: DeepSeek direct, OrcaRouter free gateway, Ox Alpha via OpenRouter (1M context), or any custom endpoint.
+3. **Agent**: Claude Code (Anthropic env wiring), OpenCode (standard provider keys + `-m provider/model`), or Codex (`-c model_provider` overrides over an OpenAI-compatible endpoint). Provider→tool translation is automatic; unsupported combinations warn instead of failing silently.
+4. **Effort level** up to Ultracode (applied where the agent supports it), then the project path.
+5. **Session preparation**: provisions the 6 toolkits if missing, vendors the OS runtime into the project when absent (native hooks + settings, lifecycle scripts, the Universal Meta-Skill, pinned `.mcp.json`, lint config) so MCP servers, skills, and hooks load directly into the session.
+6. **Launches the chosen agent** with the chosen prompt as its first message.
 
 No keys are stored in the script: environment → gitignored `.env.vantrilex` sidecar (opt-in save) → interactive paste, masked to the last 6 characters.
 
