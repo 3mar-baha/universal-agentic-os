@@ -7,7 +7,7 @@ Universal Agentic Engineering OS turns a raw mission statement into a verified, 
 [🌍 Read this in Arabic](README.ar.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -105,7 +105,8 @@ One entry point over everything above. Install it with `bash scripts/uos.sh inst
 | `uos graph [--check]` | Syncs the repo tree into a marker-bounded Mermaid graph in the architecture doc; `--check` fails CI on stale graphs |
 | `uos decide <TITLE>` | Appends an auditable ADR to the decision log (`docs/09-DECISIONS.md` or `docs/03-DECISIONS.md`) |
 | `uos doctor` | Sub-second diagnostics: runtimes, hook wiring, API-key presence, toolkit integrity |
-| `uos ship [--release]` | Runs all local quality gates and prints the release checklist; `--release` additionally opens a draft GitHub release via `gh` for you to publish |
+| `uos ship [--release]` | Runs all local quality gates (now including version consistency across changelog/badges/CLI and architecture-graph currency) and prints the release checklist; `--release` additionally opens a draft GitHub release via `gh` for you to publish |
+| `uos release <X.Y.Z>` | One-command publish: extracts the version's CHANGELOG section as release notes, tags, pushes, and creates the GitHub release (`--draft` to review first); a tag-push workflow attaches the source tarball to the release |
 | `uos status` | Compact 3-line card: active phase, active milestone, test status |
 
 ## Bundled Skills

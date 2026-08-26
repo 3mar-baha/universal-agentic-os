@@ -7,7 +7,7 @@
 🌍 [النسخة الإنجليزية](README.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)
 ![Skills](https://img.shields.io/badge/skills-7-blue.svg)
 ![Docs](https://img.shields.io/badge/docs-7-blue.svg)
 ![Shells](https://img.shields.io/badge/shells-bash%20%7C%20zsh-black.svg)
@@ -105,7 +105,8 @@ claude
 | `uos graph [--check]` | يزامن شجرة المستودع داخل مخطط Mermaid محدود بمؤشرات في مستند المعمارية؛ ويفشل `--check` عند تقادم المخطط |
 | `uos decide <TITLE>` | يُلحق سجل قرار معماري (ADR) قابلًا للتدقيق بسجل القرارات (`docs/09-DECISIONS.md` أو `docs/03-DECISIONS.md`) |
 | `uos doctor` | تشخيصات بيئة خلال أجزاء من الثانية: بيئات التشغيل، ربط الخطّافات، وجود مفاتيح API، سلامة حزمة الأدوات |
-| `uos ship [--release]` | يشغّل كل بوابات الجودة المحلية ويطبع قائمة الإصدار؛ وخيار `--release` يفتح مسودة إصدار GitHub عبر `gh` لتنشرها أنت |
+| `uos ship [--release]` | يشغّل كل بوابات الجودة المحلية (وتشمل الآن اتساق الإصدار بين سجل التغيير والشارات وواجهة CLI، وتحديث مخطط المعمارية) ويطبع قائمة الإصدار؛ وخيار `--release` يفتح مسودة إصدار GitHub عبر `gh` لتنشرها أنت |
+| `uos release <X.Y.Z>` | نشر بأمر واحد: يستخرج قسم الإصدار من سجل التغيير كملاحظات، ثم يوسم ويدفع وينشئ إصدار GitHub (وخيار `--draft` للمراجعة أولًا)؛ ويرفع workflow دفع التاغ الأرشيف المصدرّي إلى صفحة الإصدار تلقائيًا |
 | `uos status` | بطاقة ASCII مكوّنة من ثلاثة أسطر: المرحلة النشطة، المعلَمة النشطة، حالة الاختبارات |
 
 ## المهارات المضمّنة

@@ -47,6 +47,13 @@ if [ -n "$ADDED_LINES" ]; then
         fail 'staged diff contains a credential-like assignment (KEY/SECRET/TOKEN/PASSWORD = long literal).'
     fi
 
+    # 1c. Bearer tokens in JSON/YAML-style headers ("Authorization": "Bearer ...").
+    #     Written so this hook's own source never matches it.
+    if printf '%s\n' "$ADDED_LINES" | grep -EqiE \
+        '"authorization"[[:space:]]*:[[:space:]]*"bearer [A-Za-z0-9+/_=-]{24,}"'; then
+        fail 'staged diff contains a bearer token in an Authorization header; reference credentials by environment variable name only.'
+    fi
+
     # 3. AI attribution inside staged content. Textual markers are matched
     #    only as trailer-shaped lines (at line start) so that documentation
     #    ABOUT the rule — including this hook's own source — is not itself

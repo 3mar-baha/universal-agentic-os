@@ -153,8 +153,9 @@ The machinery that enforces them:
   It never touches project code, `docs/`, or bundled `skills/`.
 - **Pre-commit secret scanning** — `.githooks/pre-commit` (activate once with
   `scripts/setup-git-hooks.sh`) rejects commits containing known API-key formats
-  (`sk-ant-*`, `sk-or-v1-*`, `gh*_*`, `github_pat_*`, `xox*-*`, `AKIA*`), credential-shaped
-  assignments, literal `.env` files, and AI-attribution markers. Never bypass with `--no-verify`.
+  (`sk-ant-*`, `sk-or-v1-*`, `gh*_*`, `github_pat_*`, `xox*-*`, `AKIA*`), bearer tokens in
+  JSON/YAML `Authorization` headers, credential-shaped assignments, literal `.env` files, and
+  AI-attribution markers. Never bypass with `--no-verify`.
 - **Strict zero AI attribution** — no `Co-authored-by` trailers, no "Generated with" footers, no
   agent badges; `.githooks/pre-commit` and `.githooks/commit-msg` enforce this at commit time.
 - **Upstream ECC lifecycle hooks** — stage orchestration vendors the dependency-free bash hooks
@@ -181,6 +182,7 @@ The `uos` CLI (`scripts/uos.sh`, install with `uos install`) wraps every operati
 | `uos graph [--check]` | Sync the repo tree into the architecture doc's marker-bounded Mermaid graph; `--check` fails on stale graphs |
 | `uos decide <TITLE>` | Append an auditable ADR to the decision log (auto-detected: `docs/09-DECISIONS.md` or `docs/03-DECISIONS.md`) |
 | `uos ship [--release]` | Run all local quality gates and print (or draft) the release |
+| `uos release <X.Y.Z>` | One-command publish: CHANGELOG section becomes the notes; tag, push, GitHub release, artifact attached by workflow |
 | `uos status` | Compact 3-line card: phase, milestone, test state, toolkit state |
 
 ## 7. Reading Order and Precedence

@@ -204,7 +204,7 @@ graph TD
     ROOT --> n4[".env.example"]
     ROOT --> n5[".gitattributes"]
     ROOT --> n6[".githooks/ (2 files)"]
-    ROOT --> n7[".github/ (1 files)"]
+    ROOT --> n7[".github/ (2 files)"]
     ROOT --> n8[".gitignore"]
     ROOT --> n9[".markdownlint.jsonc"]
     ROOT --> n10[".mcp.json"]
@@ -215,7 +215,7 @@ graph TD
     ROOT --> n15["README.ar.md"]
     ROOT --> n16["README.md"]
     ROOT --> n17["docs/ (10 files)"]
-    ROOT --> n18["scripts/ (11 files)"]
+    ROOT --> n18["scripts/ (12 files)"]
     ROOT --> n19["skills/ (7 files)"]
 ```
 <!-- uos:graph:end -->

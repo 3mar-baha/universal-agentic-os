@@ -16,6 +16,9 @@
 #                         Mermaid graph (scripts/generate-graph.sh)
 #   uos decide <TITLE>    append an ADR to the decision log
 #                         (scripts/record-decision.sh)
+#   uos release <X.Y.Z>   tag, push, and publish a GitHub release whose
+#                         notes are the matching CHANGELOG section
+#                         (--draft to review before publishing)
 #   uos ship [--release]  run all local quality gates and prepare a GitHub
 #                         release (--release creates a DRAFT via gh; you
 #                         publish it)
@@ -44,7 +47,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$UOS_SOURCE")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHECKPOINT="${REPO_ROOT}/docs/10-CHECKPOINT.md"
-UOS_VERSION="1.3.0"
+UOS_VERSION="1.3.1"
 
 usage() {
     sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '2,20p'
@@ -135,6 +138,9 @@ cmd_doctor() {
     check jq jq --version
     check gh gh --version
     check npx npx --version
+    # uvx runs two of the five pinned MCP servers (.mcp.json: fetch, git);
+    # its absence fails those servers silently at session time.
+    check uvx uvx --version
 
     # Git hook wiring.
     if [ "$(git -C "$REPO_ROOT" config core.hooksPath 2> /dev/null)" = ".githooks" ]; then
@@ -230,7 +236,7 @@ cmd_status() {
 }
 
 cmd_ship() {
-    local release=0 f rc=0 version notes_tag
+    local release=0 f rc=0 version consistent src src_ver
 
     [ "${1:-}" = "--release" ] && release=1
 
@@ -257,6 +263,34 @@ cmd_ship() {
         rc=1
     fi
 
+    # Release-consistency gate: CHANGELOG head, README badges, and the CLI
+    # must all declare the same version.
+    version="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' "${REPO_ROOT}/CHANGELOG.md" 2> /dev/null | tr -d '[]# ' | sed 's/^##//')"
+    version="${version:-unknown}"
+    consistent=1
+    for src in README.md README.ar.md; do
+        src_ver="$(grep -m1 -oE 'version-[0-9]+\.[0-9]+\.[0-9]+' "${REPO_ROOT}/${src}" 2> /dev/null | cut -d- -f2-)"
+        if [ "$src_ver" != "$version" ]; then
+            echo "[ship]   versions ......... FAIL (${src} badge '${src_ver:-absent}' != CHANGELOG ${version})"
+            consistent=0
+        fi
+    done
+    if [ "$UOS_VERSION" != "$version" ]; then
+        echo "[ship]   versions ......... FAIL (CLI ${UOS_VERSION} != CHANGELOG ${version})"
+        consistent=0
+    fi
+    [ "$consistent" -eq 1 ] && echo "[ship]   versions ......... ${version} across changelog, badges, cli"
+    [ "$consistent" -eq 1 ] || rc=1
+
+    # Architecture-graph gate: a stale embedded graph fails locally now,
+    # not only in CI.
+    if bash "${SCRIPT_DIR}/generate-graph.sh" --check > /dev/null 2>&1; then
+        echo '[ship]   arch graph ....... current'
+    else
+        echo '[ship]   arch graph ....... STALE (run: uos graph)'
+        rc=1
+    fi
+
     if bash "${SCRIPT_DIR}/ingest-specs.sh" > /dev/null 2>&1; then
         echo '[ship]   spec fidelity .... cross-references resolve'
     else
@@ -276,13 +310,10 @@ cmd_ship() {
         return 1
     fi
 
-    version="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' "${REPO_ROOT}/CHANGELOG.md" 2> /dev/null | tr -d '[]# ' | sed 's/^##//')"
-    version="${version:-unknown}"
     echo "[ship] all gates green. latest CHANGELOG version: ${version}"
     echo '[ship] release checklist:'
-    echo "         1. tag:      git tag -a v${version} -m \"v${version}\""
-    echo "         2. push tag: git push origin v${version}"
-    echo "         3. release:  gh release create v${version} --title \"v${version}\" --notes-file CHANGELOG.md"
+    echo "         uos release ${version}          # tag, push, publish with CHANGELOG notes"
+    echo "         uos release ${version} --draft  # same, but review before publishing"
 
     if [ "$release" -eq 1 ]; then
         if ! command -v gh > /dev/null 2>&1; then
@@ -334,6 +365,7 @@ main() {
         dispatch) exec bash "${SCRIPT_DIR}/dispatch-worktrees.sh" "$@" ;;
         graph)    exec bash "${SCRIPT_DIR}/generate-graph.sh" "$@" ;;
         decide)   exec bash "${SCRIPT_DIR}/record-decision.sh" "$@" ;;
+        release)  exec bash "${SCRIPT_DIR}/release.sh" "$@" ;;
         merge)    exec bash "${SCRIPT_DIR}/merge-worktrees.sh" "$@" ;;
         doctor)   cmd_doctor "$@" ;;
         ship)     cmd_ship "$@" ;;

@@ -2,6 +2,22 @@
 
 All notable changes to the Universal Agentic Engineering OS are documented in this file. The format follows Keep a Changelog and versions follow Semantic Versioning.
 
+## [1.3.1] - 2026-08-26
+
+Six small gates and one big shortcut — each closes a gap observed in practice during the v1.2.0/v1.3.0 ships.
+
+### Added
+
+- `scripts/release.sh` + `uos release <X.Y.Z> [--draft]`: one-command publishing. Validates the version, extracts its CHANGELOG section as the release notes (nothing invented), refuses on a dirty tree or an existing tag, then tags, pushes, and creates the GitHub release via `gh`.
+- `.github/workflows/release.yml`: on any `v*` tag push, packages the source tarball (now including `.mcp.json` and `.devcontainer/`) and attaches it to the GitHub release; self-heals if the tag lands before the release is created.
+- `uos ship` gains two gates: version consistency (CHANGELOG head must equal both README badges and the CLI's own version) and architecture-graph currency (`generate-graph.sh --check`).
+- `uos doctor` now checks for `uvx`, which runs two of the five pinned MCP servers (`fetch`, `git`); its absence previously failed those servers silently at session time.
+
+### Changed
+
+- `.githooks/pre-commit`: bearer tokens in JSON/YAML-style `Authorization` headers are now rejected alongside known API-key formats, closing a real scan gap for MCP-style configs.
+- READMEs document the new command and gates; the meta-skill reflects the extended secret scanning.
+
 ## [1.3.0] - 2026-08-26
 
 Level-3 agentic maturity: pinned MCP protocol, upstream ECC lifecycle integration, a live architecture graph, an automated ADR ledger, and one-command sandbox parity.
